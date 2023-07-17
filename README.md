@@ -1,3 +1,7 @@
+<center>
+<img src="./icon.png" width=200>
+</center>
+
 # Project Herta
 An HSR Assistant
 
