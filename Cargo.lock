@@ -411,7 +411,6 @@ dependencies = [
 [[package]]
 name = "herta-lib"
 version = "0.1.0"
-source = "git+https://github.com/Kiwifuit/herta-lib#bdf95730cd0a0a5079ae632eafddfcbc9ad80cd1"
 dependencies = [
  "scraper",
  "url",
