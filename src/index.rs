@@ -1,8 +1,10 @@
 use crate::types::*;
 mod character;
 
+const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
+
 pub async fn index_characters() -> (Vec<String>, Vec<String>, Vec<Character>) {
-    let resp = reqwest::get("https://honkai-star-rail.fandom.com/wiki/Character/List")
+    let resp = reqwest::get(CHARACTER_INDEX)
         .await
         .unwrap()
         .text()
