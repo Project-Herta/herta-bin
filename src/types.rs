@@ -2,8 +2,8 @@
 pub struct Character {
     name: String,
     rarity: u8,
-    path: CharacterCType,
-    combat_type: CharacterPath,
+    path: CharacterPath,
+    combat_type: CharacterCType,
 }
 
 impl Character {
@@ -15,10 +15,10 @@ impl Character {
         }
 
         meta = meta << 2;
-        meta &= <CharacterPath as Into<u8>>::into(self.combat_type.clone().into());
+        meta &= <CharacterCType as Into<u8>>::into(self.combat_type.clone().into());
 
         meta = meta << 3;
-        meta &= <CharacterCType as Into<u8>>::into(self.path.clone().into());
+        meta &= <CharacterPath as Into<u8>>::into(self.path.clone().into());
 
         meta
     }
