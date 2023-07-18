@@ -13,7 +13,9 @@ async fn main() {
     for character in herta::extractor::index_characters(resp) {
         dbg!(character.name);
         dbg!(character.path);
+        dbg!(character.path_image);
         dbg!(character.ctype);
+        dbg!(character.ctype_image);
         a += 1;
     }
     println!("{} characters indexed", a)
