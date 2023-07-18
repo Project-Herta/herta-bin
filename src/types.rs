@@ -24,11 +24,24 @@ impl Character {
     }
 }
 
-// impl From<herta::extractor::Character> for Character {
-//     fn from(value: herta::extractor::Character) -> Self {
+impl From<herta::extractor::Character> for Character {
+    fn from(value: herta::extractor::Character) -> Self {
+        let herta::extractor::Character {
+            name,
+            rarity,
+            path,
+            ctype,
+            ..
+        } = value;
 
-//     }
-// }
+        Self {
+            name,
+            path: path.try_into().unwrap(),
+            rarity: rarity.strip_suffix(" Stars").unwrap().parse().unwrap(),
+            combat_type: ctype.try_into().unwrap(),
+        }
+    }
+}
 
 #[derive(Debug, Clone)]
 pub enum CharacterCType {
