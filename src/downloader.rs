@@ -1,12 +1,13 @@
 use futures_util::StreamExt;
 use reqwest::get;
+use reqwest::header;
 
 use std::fs::OpenOptions;
 use std::io::{self, prelude::*};
 
 pub trait Downloadable {
     fn url(&self) -> String;
-    fn filename(&self) -> String;
+    fn filename(&self) -> Option<String>;
 }
 
 pub enum DownloadError {
@@ -21,11 +22,29 @@ where
     let resp = get(image.url())
         .await
         .map_err(|e| DownloadError::NetworkError(e))?;
+    let headers = resp.headers().clone();
     let mut stream = resp.bytes_stream();
+
+    let filename = image.filename().unwrap_or_else(|| {
+        let raw = headers
+            .get(header::CONTENT_DISPOSITION)
+            .unwrap()
+            .to_str()
+            .unwrap();
+
+        let length = raw.len();
+        let index = raw
+            .find("=")
+            .expect("expected to find an '=' somewhere in the disposition");
+        let disposition = &raw[index + 1..length - 1];
+
+        disposition.to_string()
+    });
+
     let mut savefile = OpenOptions::new()
         .create_new(true)
         .write(true)
-        .open(image.filename())
+        .open(filename)
         .map_err(|e| DownloadError::CreateFileError(e))?;
 
     let mut downloaded_total = 0;
