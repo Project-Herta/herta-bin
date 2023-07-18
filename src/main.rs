@@ -1,3 +1,5 @@
+mod types;
+
 #[tokio::main]
 async fn main() {
     let resp = reqwest::get("https://honkai-star-rail.fandom.com/wiki/Character/List")
