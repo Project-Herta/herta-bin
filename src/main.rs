@@ -1,3 +1,4 @@
+mod downloader;
 mod index;
 mod types;
 
