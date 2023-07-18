@@ -5,6 +5,7 @@ const STAR_CHAR: &str = "✦";
 #[derive(Debug)]
 pub struct Character {
     name: String,
+    link: String,
     rarity: u8,
     path: CharacterPath,
     combat_type: CharacterCType,
@@ -23,6 +24,10 @@ impl Character {
     pub fn combat_type(&self) -> &CharacterCType {
         &self.combat_type
     }
+
+    pub fn link(&self) -> &String {
+        &self.link
+    }
 }
 
 impl From<herta::extractor::Character> for Character {
@@ -34,11 +39,13 @@ impl From<herta::extractor::Character> for Character {
             ctype,
             path_image,
             ctype_image,
+            link,
             ..
         } = value;
 
         Self {
             name,
+            link,
             path: path.try_into().unwrap(),
             rarity: rarity.strip_suffix(" Stars").unwrap().parse().unwrap(),
             combat_type: ctype.try_into().unwrap(),
