@@ -10,6 +10,16 @@ pub trait Downloadable {
     fn filename(&self) -> Option<String>;
 }
 
+impl Downloadable for String {
+    fn filename(&self) -> Option<String> {
+        None
+    }
+
+    fn url(&self) -> String {
+        self.to_owned()
+    }
+}
+
 pub enum DownloadError {
     NetworkError(reqwest::Error),
     CreateFileError(io::Error),
