@@ -401,6 +401,7 @@ name = "herta-bin"
 version = "0.1.0"
 dependencies = [
  "fern_colored",
+ "futures-util",
  "herta-lib",
  "log",
  "reqwest",
