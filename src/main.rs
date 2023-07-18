@@ -11,8 +11,8 @@ async fn main() {
 
     let mut a = 0;
     for character in herta::extractor::index_characters(resp) {
+        dbg!(character.name);
         dbg!(character.path);
-        dbg!(character.rarity);
         dbg!(character.ctype);
         a += 1;
     }
