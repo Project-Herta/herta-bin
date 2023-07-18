@@ -29,5 +29,9 @@ async fn main() {
         }
     }
 
-    println!("Indexed {} characters,", characters.len())
+    println!("Indexed {} characters", characters.len());
+
+    for character in characters {
+        println!("{}", character)
+    }
 }

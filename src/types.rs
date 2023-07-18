@@ -1,3 +1,7 @@
+use std::fmt::Display;
+
+const STAR_CHAR: &str = "✦";
+
 #[derive(Debug)]
 pub struct Character {
     name: String,
@@ -7,20 +11,15 @@ pub struct Character {
 }
 
 impl Character {
-    pub fn pack_meta(&self) -> u8 {
-        let mut meta = 0;
+    pub fn rarity(&self) -> &u8 {
+        &self.rarity
+    }
 
-        if self.rarity == 5 {
-            meta &= 1;
-        }
-
-        meta = meta << 2;
-        meta &= <CharacterCType as Into<u8>>::into(self.combat_type.clone().into());
-
-        meta = meta << 3;
-        meta &= <CharacterPath as Into<u8>>::into(self.path.clone().into());
-
-        meta
+    pub fn path(&self) -> &CharacterPath {
+        &self.path
+    }
+    pub fn combat_type(&self) -> &CharacterCType {
+        &self.combat_type
     }
 }
 
@@ -40,6 +39,24 @@ impl From<herta::extractor::Character> for Character {
             rarity: rarity.strip_suffix(" Stars").unwrap().parse().unwrap(),
             combat_type: ctype.try_into().unwrap(),
         }
+    }
+}
+
+impl Display for Character {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "{} ({}✦) {} {:?}/{:?}",
+            STAR_CHAR
+                .chars()
+                .cycle()
+                .take(self.rarity as usize)
+                .collect::<String>(),
+            self.rarity,
+            self.name,
+            self.path,
+            self.combat_type
+        )
     }
 }
 
