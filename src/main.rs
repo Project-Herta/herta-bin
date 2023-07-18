@@ -9,9 +9,25 @@ async fn main() {
         .await
         .unwrap();
 
-    let mut a = 0;
+    let mut rarity_images = vec![];
+    let mut ctype_images = vec![];
+    let mut characters = vec![];
     for character in herta::extractor::index_characters(resp) {
-        a += 1;
+        let rarity = character.rarity_image.clone();
+        let ctype = character.ctype_image.clone();
+
+        let character = types::Character::from(character);
+
+        characters.push(character);
+
+        if !rarity_images.contains(&rarity) {
+            rarity_images.push(rarity)
+        }
+
+        if !ctype_images.contains(&ctype) {
+            ctype_images.push(ctype)
+        }
     }
-    println!("{} characters indexed", a)
+
+    println!("Indexed {} characters,", characters.len())
 }
