@@ -3,7 +3,7 @@ mod character;
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
-pub async fn index_characters() -> (Vec<String>, Vec<String>, Vec<Character>) {
+pub async fn index_characters() -> (Vec<String>, Vec<Character>) {
     let resp = reqwest::get(CHARACTER_INDEX)
         .await
         .unwrap()
@@ -31,5 +31,5 @@ pub async fn index_characters() -> (Vec<String>, Vec<String>, Vec<Character>) {
         }
     }
 
-    (rarity_images, ctype_images, characters)
+    (rarity_images, characters)
 }
