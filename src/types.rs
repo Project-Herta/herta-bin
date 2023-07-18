@@ -8,6 +8,7 @@ pub struct Character {
     rarity: u8,
     path: CharacterPath,
     combat_type: CharacterCType,
+    images: [String; 2],
 }
 
 impl Character {
@@ -18,6 +19,7 @@ impl Character {
     pub fn path(&self) -> &CharacterPath {
         &self.path
     }
+
     pub fn combat_type(&self) -> &CharacterCType {
         &self.combat_type
     }
@@ -30,6 +32,8 @@ impl From<herta::extractor::Character> for Character {
             rarity,
             path,
             ctype,
+            path_image,
+            ctype_image,
             ..
         } = value;
 
@@ -38,6 +42,7 @@ impl From<herta::extractor::Character> for Character {
             path: path.try_into().unwrap(),
             rarity: rarity.strip_suffix(" Stars").unwrap().parse().unwrap(),
             combat_type: ctype.try_into().unwrap(),
+            images: [path_image, ctype_image],
         }
     }
 }
