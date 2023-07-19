@@ -24,10 +24,6 @@ impl Character {
     pub fn combat_type(&self) -> &CharacterCType {
         &self.combat_type
     }
-
-    pub fn link(&self) -> &String {
-        &self.link
-    }
 }
 
 impl From<herta::extractor::Character> for Character {

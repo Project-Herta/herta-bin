@@ -7,14 +7,13 @@ use std::io::{self, prelude::*};
 
 pub trait Downloadable {
     fn url(&self) -> String;
-    fn filename(&self) -> Option<String>;
-}
 
-impl Downloadable for String {
     fn filename(&self) -> Option<String> {
         None
     }
+}
 
+impl Downloadable for String {
     fn url(&self) -> String {
         self.to_owned()
     }
