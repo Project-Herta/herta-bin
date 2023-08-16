@@ -16,8 +16,18 @@ pub async fn index_characters() -> (Vec<String>, Vec<Character>) {
     for character in herta::extractor::index_characters(resp) {
         let rarity = character.rarity_image.clone();
         let ctype = character.ctype_image.clone();
+        let html = reqwest::get(format!("{}/Media", character.link))
+            .await
+            .unwrap()
+            .text()
+            .await
+            .unwrap();
 
-        let character = Character::from(character);
+        let (portrait, splash) = herta::extractor::get_character_art(html).await.unwrap();
+        let mut character = Character::from(character);
+
+        character.portrait = Some(portrait);
+        character.splash = Some(splash);
 
         characters.push(character);
 
