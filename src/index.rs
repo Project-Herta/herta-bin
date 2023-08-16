@@ -11,8 +11,7 @@ pub async fn index_characters() -> (Vec<String>, Vec<Character>) {
         .await
         .unwrap();
 
-    let mut rarity_images = vec![];
-    let mut ctype_images = vec![];
+    let mut resources = vec![];
     let mut characters = vec![];
     for character in herta::extractor::index_characters(resp) {
         let rarity = character.rarity_image.clone();
@@ -22,14 +21,14 @@ pub async fn index_characters() -> (Vec<String>, Vec<Character>) {
 
         characters.push(character);
 
-        if !rarity_images.contains(&rarity) {
-            rarity_images.push(rarity)
+        if !resources.contains(&rarity) {
+            resources.push(rarity)
         }
 
-        if !ctype_images.contains(&ctype) {
-            ctype_images.push(ctype)
+        if !resources.contains(&ctype) {
+            resources.push(ctype)
         }
     }
 
-    (rarity_images, characters)
+    (resources, characters)
 }

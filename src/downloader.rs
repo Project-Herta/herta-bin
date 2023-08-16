@@ -1,7 +1,4 @@
 use futures_util::StreamExt;
-use rayon::ThreadPool;
-use rayon::ThreadPoolBuilder;
-use rayon::{prelude::*, scope};
 use reqwest::header;
 use reqwest::Response;
 
