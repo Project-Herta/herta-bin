@@ -28,6 +28,8 @@ pub async fn index_characters() -> (Vec<String>, Vec<Character>) {
 
         character.portrait = Some(portrait);
         character.splash = Some(splash);
+        resources.push(character.portrait.clone().unwrap());
+        resources.push(character.splash.clone().unwrap());
 
         characters.push(character);
 

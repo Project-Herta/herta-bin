@@ -9,9 +9,8 @@ async fn main() {
     println!("Indexed {} characters", characters.len());
 
     for character in characters {
-        dbg!(character.portrait);
-        dbg!(character.splash);
+        println!("{}", character);
     }
 
-    // dbg!(resources);
+    dbg!(resources);
 }
