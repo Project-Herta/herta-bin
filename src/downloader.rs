@@ -2,7 +2,7 @@ use futures_util::StreamExt;
 use reqwest::header;
 use reqwest::Response;
 
-use std::fs::OpenOptions;
+use std::fs::{metadata, OpenOptions};
 use std::io::{self, prelude::*};
 
 pub trait Downloadable {
@@ -76,6 +76,11 @@ where
 
             disposition.to_string()
         });
+
+        if let Ok(_) = metadata(&filename) {
+            // We skipping that download
+            continue;
+        }
 
         let mut savefile = OpenOptions::new()
             .create_new(true)
