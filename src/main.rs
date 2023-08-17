@@ -13,8 +13,7 @@ async fn main() {
     println!("Resources will be indexed and downloaded for faster");
     println!("startup times in the future");
     println!("");
-    println!("This WILL take a while, and will download");
-    println!("150+ images");
+    println!("This procedure will take a while (including downloads)");
     println!("========================================================");
 
     let scraping_time = Instant::now();
