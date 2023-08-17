@@ -24,5 +24,9 @@ async fn main() {
     //     println!("{}", character);
     // }
 
+    for enemy in enemies {
+        dbg!(enemy);
+    }
+
     println!("{} resource(s) to be downloaded", resource_pool.len());
 }
