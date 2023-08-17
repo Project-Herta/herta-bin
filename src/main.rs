@@ -74,9 +74,7 @@ async fn main() {
 
     // dbg!(&resource_pool);
     println!("{} resource(s) to be downloaded", &resource_pool.len());
-    let downloads: Result<usize, downloader::DownloadError> =
-        downloader::download_image(&resource_pool).await;
+    let downloads = downloader::download_image(&resource_pool).await;
 
     dbg!(downloads);
-    // scope(|s| for download in downloads {})
 }
