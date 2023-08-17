@@ -4,22 +4,21 @@ const STAR_CHAR: &str = "✦";
 
 #[derive(Debug)]
 pub struct Enemy {
-    name: String,
-    link: String,
-    drops: Vec<herta::extractor::EnemyDrops>,
+    pub name: String,
+    pub link: String,
+    pub portrait: String,
+    pub res_values: Vec<u8>,
+    pub dres_values: Vec<u8>, // Effect RES
 }
 
 impl From<herta::extractor::Enemy> for Enemy {
     fn from(value: herta::extractor::Enemy) -> Self {
-        // TODO: Research how to scrape for enemy drops
-        // herta::extractor::get_enemy_drops(html, enemy)
-
         Self {
             link: value.link,
             name: value.name,
-
-            // FIXME: This shouldn't be empty by 1.0.0
-            drops: vec![],
+            portrait: String::new(),
+            res_values: vec![],
+            dres_values: vec![],
         }
     }
 }
