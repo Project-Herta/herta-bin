@@ -21,7 +21,7 @@ pub async fn index_characters(resources: &mut Vec<String>) -> Vec<Character> {
             .await
             .unwrap();
 
-        let (portrait, splash) = herta::extractor::get_character_art(html).await.unwrap();
+        let (portrait, splash) = herta::extractor::get_character_art(html).unwrap();
         let mut character = Character::from(character);
 
         character.portrait = Some(portrait);
