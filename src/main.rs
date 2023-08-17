@@ -1,3 +1,6 @@
+use humantime::format_duration;
+use std::time::Instant;
+
 mod downloader;
 mod index;
 mod types;
@@ -14,6 +17,7 @@ async fn main() {
     println!("150+ images");
     println!("========================================================");
 
+    let scraping_time = Instant::now();
     let mut resource_pool = vec![];
     let enemies = tokio::spawn(async {
         let mut resource_pool = vec![];
@@ -42,6 +46,8 @@ async fn main() {
             break;
         }
     }
+    let scraping_elapsed = scraping_time.elapsed();
+    println!("Took {}", format_duration(scraping_elapsed));
 
     let (enemies, enemies_resources) = enemies.await.unwrap();
     let (characters, characters_resources) = characters.await.unwrap();
