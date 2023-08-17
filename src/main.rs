@@ -14,7 +14,7 @@ async fn main() {
     println!("megabytes worth of images");
     println!("========================================================");
 
-    let (resources, characters) = index::index_characters().await;
+    let (resources, characters) = index::character::index_characters().await;
 
     println!("Indexed {} characters", characters.len());
 
