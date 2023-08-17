@@ -37,6 +37,13 @@ impl Downloadable for Vec<String> {
     }
 }
 
+impl Downloadable for &Vec<String> {
+    fn urls(&self) -> Option<Vec<String>> {
+        Some(self.to_owned().to_owned())
+    }
+}
+
+#[derive(Debug)]
 pub enum DownloadError {
     NetworkError(reqwest::Error),
     CreateFileError(io::Error),
