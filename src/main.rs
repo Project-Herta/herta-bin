@@ -15,7 +15,7 @@ async fn main() {
     println!("========================================================");
 
     let mut resource_pool = vec![];
-    let enemies = index::enemy::index_enemies(&mut resource_pool);
+    let enemies = index::enemy::index_enemies(&mut resource_pool).await;
     // let characters = index::character::index_characters(&mut resource_pool).await;
 
     // println!("Indexed {} characters", characters.len());

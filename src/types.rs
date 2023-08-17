@@ -3,6 +3,28 @@ use std::fmt::Display;
 const STAR_CHAR: &str = "✦";
 
 #[derive(Debug)]
+pub struct Enemy {
+    name: String,
+    link: String,
+    drops: Vec<herta::extractor::EnemyDrops>,
+}
+
+impl From<herta::extractor::Enemy> for Enemy {
+    fn from(value: herta::extractor::Enemy) -> Self {
+        // TODO: Research how to scrape for enemy drops
+        // herta::extractor::get_enemy_drops(html, enemy)
+
+        Self {
+            link: value.link,
+            name: value.name,
+
+            // FIXME: This shouldn't be empty by 1.0.0
+            drops: vec![],
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct Character {
     name: String,
     link: String,
