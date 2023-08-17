@@ -46,7 +46,7 @@ impl Downloadable for &Vec<String> {
 #[derive(Debug)]
 pub enum DownloadError {
     NetworkError(reqwest::Error),
-    CreateFileError(io::Error),
+    CreateFileError(io::Error, String),
     NothingToDownload,
 }
 
@@ -81,8 +81,8 @@ where
         let mut savefile = OpenOptions::new()
             .create_new(true)
             .write(true)
-            .open(filename)
-            .map_err(|e| DownloadError::CreateFileError(e))?;
+            .open(&filename)
+            .map_err(|e| DownloadError::CreateFileError(e, filename))?;
 
         while let Some(chunk) = stream.next().await {
             let bytes = chunk.unwrap();
