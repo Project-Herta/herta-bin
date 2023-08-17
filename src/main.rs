@@ -15,13 +15,14 @@ async fn main() {
     println!("========================================================");
 
     let mut resource_pool = vec![];
-    let characters = index::character::index_characters(&mut resource_pool).await;
+    let enemies = index::enemy::index_enemies(&mut resource_pool);
+    // let characters = index::character::index_characters(&mut resource_pool).await;
 
-    println!("Indexed {} characters", characters.len());
+    // println!("Indexed {} characters", characters.len());
 
-    for character in characters {
-        println!("{}", character);
-    }
+    // for character in characters {
+    //     println!("{}", character);
+    // }
 
     println!("{} resource(s) to be downloaded", resource_pool.len());
 }
