@@ -2,7 +2,7 @@ use crate::types::*;
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
-pub async fn index_characters() -> (Vec<String>, Vec<Character>) {
+pub async fn index_characters(resources: &mut Vec<String>) -> Vec<Character> {
     let resp = reqwest::get(CHARACTER_INDEX)
         .await
         .unwrap()
@@ -10,7 +10,6 @@ pub async fn index_characters() -> (Vec<String>, Vec<Character>) {
         .await
         .unwrap();
 
-    let mut resources = vec![];
     let mut characters = vec![];
     for character in herta::extractor::index_characters(resp) {
         let rarity = character.rarity_image.clone();
@@ -41,5 +40,5 @@ pub async fn index_characters() -> (Vec<String>, Vec<Character>) {
         }
     }
 
-    (resources, characters)
+    characters
 }

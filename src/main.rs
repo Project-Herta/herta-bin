@@ -14,7 +14,8 @@ async fn main() {
     println!("megabytes worth of images");
     println!("========================================================");
 
-    let (resources, characters) = index::character::index_characters().await;
+    let mut resource_pool = vec![];
+    let characters = index::character::index_characters(&mut resource_pool).await;
 
     println!("Indexed {} characters", characters.len());
 
@@ -22,5 +23,5 @@ async fn main() {
         println!("{}", character);
     }
 
-    println!("{} resource(s) to be downloaded", resources.len());
+    println!("{} resource(s) to be downloaded", resource_pool.len());
 }
