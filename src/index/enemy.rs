@@ -25,7 +25,6 @@ pub async fn index_enemies(resources: &mut Vec<String>) -> Vec<Enemy> {
         enemy.dres_values = herta::extractor::get_enemy_debuff_resistances(html.clone());
         enemy.res_values = herta::extractor::get_enemy_resistances(html);
 
-        dbg!(&enemy);
         resources.push(enemy.portrait.clone());
         enemies.push(enemy);
     }

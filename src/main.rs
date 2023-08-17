@@ -15,18 +15,54 @@ async fn main() {
     println!("========================================================");
 
     let mut resource_pool = vec![];
-    let enemies = index::enemy::index_enemies(&mut resource_pool).await;
-    // let characters = index::character::index_characters(&mut resource_pool).await;
+    let enemies = tokio::spawn(async {
+        let mut resource_pool = vec![];
 
-    // println!("Indexed {} characters", characters.len());
+        (
+            index::enemy::index_enemies(&mut resource_pool).await,
+            resource_pool,
+        )
+    });
+
+    let characters = tokio::spawn(async {
+        let mut resource_pool = vec![];
+
+        (
+            index::character::index_characters(&mut resource_pool).await,
+            resource_pool,
+        )
+    });
+
+    println!("Waiting for both tasks to finish");
+    loop {
+        let enemies_task_is_finished = enemies.is_finished();
+        let characters_task_is_finished = characters.is_finished();
+
+        if enemies_task_is_finished && characters_task_is_finished {
+            break;
+        }
+    }
+
+    let (enemies, enemies_resources) = enemies.await.unwrap();
+    let (characters, characters_resources) = characters.await.unwrap();
+
+    resource_pool.extend(enemies_resources);
+    resource_pool.extend(characters_resources);
+
+    println!(
+        "Indexed {} characters, {} enemies",
+        characters.len(),
+        enemies.len()
+    );
 
     // for character in characters {
     //     println!("{}", character);
     // }
 
-    for enemy in enemies {
-        dbg!(enemy);
-    }
+    // for enemy in enemies {
+    //     dbg!(enemy);
+    // }
 
+    // dbg!(&resource_pool);
     println!("{} resource(s) to be downloaded", resource_pool.len());
 }
