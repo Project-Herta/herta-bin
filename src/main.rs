@@ -10,8 +10,8 @@ async fn main() {
     println!("Resources will be indexed and downloaded for faster");
     println!("startup times in the future");
     println!("");
-    println!("This WILL take a while, and will download around 100");
-    println!("megabytes worth of images");
+    println!("This WILL take a while, and will download");
+    println!("150+ images");
     println!("========================================================");
 
     let mut resource_pool = vec![];
