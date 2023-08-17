@@ -69,11 +69,10 @@ where
                 .to_str()
                 .unwrap();
 
-            let length = raw.len();
-            let index = raw
-                .find("=")
-                .expect("expected to find an '=' somewhere in the disposition");
-            let disposition = &raw[index + 1..length - 1];
+            let span = raw.match_indices("\"").map(|(i, _s)| i).collect::<Vec<_>>();
+            let start = span[0] + 1;
+            let end = span[1];
+            let disposition = &raw[start..end];
 
             disposition.to_string()
         });
