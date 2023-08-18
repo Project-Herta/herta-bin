@@ -73,7 +73,9 @@ where
         let headers = resp.headers().clone();
         let mut stream = resp.bytes_stream();
 
-        let filename = get_filename(&root_dir, image.filename(), headers);
+        let filename = get_filename(&root_dir, image.filename(), headers)
+            .canonicalize()
+            .unwrap();
 
         if let Ok(_) = metadata(&filename) {
             // We skipping that download
