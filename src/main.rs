@@ -60,9 +60,9 @@ async fn main() {
         enemies.len()
     );
 
-    // for character in characters {
-    //     println!("{}", character);
-    // }
+    for character in characters {
+        println!("{}", character);
+    }
 
     // for enemy in enemies {
     //     dbg!(enemy);

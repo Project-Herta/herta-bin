@@ -31,8 +31,16 @@ pub struct Character {
     rarity: u8,
     path: CharacterPath,
     combat_type: CharacterCType,
+
+    #[serde(skip_serializing_if = "skip")]
     pub splash: Option<String>,
+
+    #[serde(skip_serializing_if = "skip")]
     pub portrait: Option<String>,
+}
+
+fn skip(_: &Option<String>) -> bool {
+    false
 }
 
 impl Character {
