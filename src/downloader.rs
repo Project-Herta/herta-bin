@@ -73,14 +73,14 @@ where
         let headers = resp.headers().clone();
         let mut stream = resp.bytes_stream();
 
-        let filename = get_filename(&root_dir, image.filename(), headers)
-            .canonicalize()
-            .unwrap();
+        let filename = get_filename(&root_dir, image.filename(), headers);
 
         if let Ok(_) = metadata(&filename) {
             // We skipping that download
             continue;
         }
+
+        let filename = filename.canonicalize().unwrap();
 
         let mut savefile = OpenOptions::new()
             .create_new(true)
