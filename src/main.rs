@@ -1,13 +1,9 @@
 use humantime::format_duration;
-use std::sync::Arc;
-use std::thread::scope;
 use std::time::Instant;
 
 mod downloader;
 mod index;
 mod types;
-
-const MAX_DOWNLOADS: u8 = 10;
 
 #[tokio::main]
 async fn main() {
