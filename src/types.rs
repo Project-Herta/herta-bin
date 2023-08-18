@@ -1,8 +1,9 @@
+use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 const STAR_CHAR: &str = "✦";
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Enemy {
     pub name: String,
     pub link: String,
@@ -23,7 +24,7 @@ impl From<herta::extractor::Enemy> for Enemy {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Character {
     name: String,
     link: String,
@@ -89,7 +90,7 @@ impl Display for Character {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CharacterCType {
     Fire,
     Ice,
@@ -129,7 +130,7 @@ impl TryFrom<String> for CharacterCType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum CharacterPath {
     Destruction,
     Harmony,
