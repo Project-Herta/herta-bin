@@ -10,7 +10,7 @@ pub fn write_character(character: &Character) {
         create_dir_all(&root_dir);
     }
 
-    let filename = root_dir.join(format!("{}.js", character.name()));
+    let filename = root_dir.join(format!("{}.json", character.name()));
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
