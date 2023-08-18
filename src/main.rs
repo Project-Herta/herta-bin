@@ -1,6 +1,7 @@
 use humantime::format_duration;
-use std::time::Instant;
+use std::{fs::OpenOptions, time::Instant};
 
+mod data;
 mod downloader;
 mod index;
 mod types;
@@ -61,7 +62,7 @@ async fn main() {
     );
 
     for character in characters {
-        println!("{}", character);
+        data::write_character(&character);
     }
 
     // for enemy in enemies {

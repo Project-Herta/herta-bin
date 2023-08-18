@@ -40,7 +40,7 @@ pub struct Character {
 }
 
 fn skip(_: &Option<String>) -> bool {
-    false
+    true
 }
 
 impl Character {
@@ -54,6 +54,10 @@ impl Character {
 
     pub fn combat_type(&self) -> &CharacterCType {
         &self.combat_type
+    }
+
+    pub fn name(&self) -> &String {
+        &self.name
     }
 }
 
