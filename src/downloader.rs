@@ -80,8 +80,6 @@ where
             continue;
         }
 
-        let filename = filename.canonicalize().unwrap();
-
         let mut savefile = OpenOptions::new()
             .create_new(true)
             .write(true)
@@ -97,6 +95,7 @@ where
                 .expect("expected for chunk to be written");
         }
 
+        let filename = filename.canonicalize().unwrap();
         downloaded_files.push(filename);
     }
 
