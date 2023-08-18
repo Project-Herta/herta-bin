@@ -1,5 +1,4 @@
 use futures_util::StreamExt;
-use platform_dirs::AppDirs;
 use reqwest::header;
 use reqwest::header::HeaderMap;
 use reqwest::Response;
@@ -60,10 +59,10 @@ where
 {
     let resps = get(image).await?;
     let mut downloaded_total = 0;
-    let root_dir = AppDirs::new(Some(env!("CARGO_BIN_NAME")), false)
-        .unwrap()
-        .data_dir
-        .join(format!("{}/images", env!("CARGO_PKG_VERSION_MAJOR")));
+    let root_dir = herta::data::get_root_dir(
+        env!("CARGO_BIN_NAME"),
+        format!("{}/images", env!("CARGO_PKG_VERSION_MAJOR")),
+    );
 
     if !root_dir.exists() {
         create_dir_all(&root_dir);

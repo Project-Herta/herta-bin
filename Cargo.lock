@@ -426,7 +426,6 @@ dependencies = [
  "herta-lib",
  "humantime",
  "log",
- "platform-dirs",
  "reqwest",
  "tokio",
  "url",
@@ -436,6 +435,7 @@ dependencies = [
 name = "herta-lib"
 version = "0.1.0"
 dependencies = [
+ "platform-dirs",
  "scraper",
  "serde",
  "serde_json",
