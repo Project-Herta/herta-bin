@@ -6,6 +6,8 @@ pub fn write_character(character: &Character) {
         env!("CARGO_BIN_NAME"),
         Some(format!("{}/characters", env!("CARGO_PKG_VERSION_MAJOR"))),
     );
+
+    #[allow(unused_must_use)]
     if !root_dir.exists() {
         create_dir_all(&root_dir);
     }
