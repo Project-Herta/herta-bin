@@ -61,7 +61,12 @@ async fn main() {
         enemies.len()
     );
 
+    println!("Fetching Voice Overs for characters");
     for character in characters {
+        let voice_over_map =
+            index::character::get_voice_overs(&character, &mut resource_pool).await;
+
+        dbg!(voice_over_map);
         data::write_character(&character);
     }
 

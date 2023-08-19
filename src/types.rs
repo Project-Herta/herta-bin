@@ -59,6 +59,10 @@ impl Character {
     pub fn name(&self) -> &String {
         &self.name
     }
+
+    pub fn link(&self) -> &String {
+        &self.link
+    }
 }
 
 impl From<herta::extractor::Character> for Character {

@@ -1,3 +1,5 @@
+use std::{collections::HashMap, fmt::format};
+
 use crate::types::*;
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
@@ -41,4 +43,19 @@ pub async fn index_characters(resources: &mut Vec<String>) -> Vec<Character> {
     }
 
     characters
+}
+
+pub async fn get_voice_overs(
+    character: &Character,
+    resources: &mut Vec<String>,
+) -> HashMap<String, String> {
+    let url = format!("{}/Voice-Overs/{}", character.link(), "Japanese");
+    let mut res = HashMap::with_capacity(12);
+    let resp = reqwest::get(url).await.unwrap().text().await.unwrap();
+    let raw = herta::extractor::get_voice_overs(resp);
+
+    resources.extend(raw.clone().iter().map(|(_t, src)| src.to_owned()));
+    res.extend(raw);
+
+    res
 }
