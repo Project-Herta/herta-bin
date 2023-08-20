@@ -79,10 +79,16 @@ async fn first_run() {
     println!("{} resource(s) to be downloaded", &resource_pool.len());
     let (download_total, downloads) = downloader::download_image(&resource_pool).await.unwrap();
 
+    println!("Everything's ready, starting...")
     // dbg!(downloads);
 }
 
 #[tokio::main]
 async fn main() {
     first_run().await;
+
+    let player = soloud::Soloud::default().unwrap();
+    audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
+    println!("This is a temp line, would be removed in the future");
+    audio::play_voice_over(&player, audio::VoiceOverType::Parting);
 }
