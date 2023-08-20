@@ -1,48 +1,17 @@
 use futures_util::StreamExt;
-use reqwest::header;
-use reqwest::header::HeaderMap;
-use reqwest::Response;
+use reqwest::{
+    header::{self, HeaderMap},
+    Response,
+};
 
 use std::fs::{create_dir_all, metadata, OpenOptions};
 use std::io::{self, prelude::*};
 use std::path::PathBuf;
 
 pub trait Downloadable {
-    fn urls(&self) -> Option<Vec<String>> {
-        None
-    }
+    fn url(&self) -> String;
 
-    fn url(&self) -> Option<String> {
-        None
-    }
-
-    fn filename(&self) -> Option<String> {
-        None
-    }
-}
-
-impl Downloadable for String {
-    fn url(&self) -> Option<String> {
-        Some(self.to_owned())
-    }
-}
-
-impl Downloadable for &String {
-    fn url(&self) -> Option<String> {
-        Some(String::from(*self))
-    }
-}
-
-impl Downloadable for Vec<String> {
-    fn urls(&self) -> Option<Vec<String>> {
-        Some(self.to_owned())
-    }
-}
-
-impl Downloadable for &Vec<String> {
-    fn urls(&self) -> Option<Vec<String>> {
-        Some(self.to_owned().to_owned())
-    }
+    fn base_dir(&self) -> PathBuf;
 }
 
 #[derive(Debug)]
@@ -52,16 +21,24 @@ pub enum DownloadError {
     NothingToDownload,
 }
 
-pub async fn download_image<'a, I>(image: &'a I) -> Result<(usize, Vec<PathBuf>), DownloadError>
+pub async fn download_image<'a, I>(urls: &'a Vec<I>) -> Result<(usize, Vec<PathBuf>), DownloadError>
 where
     I: Downloadable + 'a,
     &'a I: Downloadable,
 {
-    let resps = get(image).await?;
+    if urls.is_empty() {
+        return Err(DownloadError::NothingToDownload);
+    }
+
+    let resps = get(urls).await?;
     let mut downloaded_total = 0;
     let root_dir = herta::data::get_root_dir(
         env!("CARGO_BIN_NAME"),
-        Some(format!("{}/images", env!("CARGO_PKG_VERSION_MAJOR"))),
+        Some(format!(
+            "{}/{}",
+            env!("CARGO_PKG_VERSION_MAJOR"),
+            urls.get(0).unwrap().base_dir().display()
+        )),
     );
 
     #[allow(unused_must_use)]
@@ -74,7 +51,7 @@ where
         let headers = resp.headers().clone();
         let mut stream = resp.bytes_stream();
 
-        let filename = get_filename(&root_dir, image.filename(), headers);
+        let filename = get_filename(&root_dir, headers);
 
         if let Ok(_) = metadata(&filename) {
             // We skipping that download
@@ -103,41 +80,37 @@ where
     Ok((downloaded_total, downloaded_files))
 }
 
-async fn get<D: Downloadable>(url: D) -> Result<Vec<Response>, DownloadError> {
-    if let Some(link) = url.url() {
-        Ok(vec![reqwest::get(link)
-            .await
-            .map_err(|e| DownloadError::NetworkError(e))?])
-    } else if let Some(links) = url.urls() {
-        let resps = links.iter().map(|i| reqwest::get(i));
+async fn get<'a, D>(urls: &'a Vec<D>) -> Result<Vec<Response>, DownloadError>
+where
+    D: 'a,
+    &'a D: Downloadable,
+{
+    let resps = urls.iter().map(|i| reqwest::get(i.url()));
 
-        let mut res = vec![];
-        for resp in resps {
-            res.push(resp.await.map_err(|e| DownloadError::NetworkError(e))?)
-        }
-
-        Ok(res)
-    } else {
-        Err(DownloadError::NothingToDownload)
+    // We're gonna have at most `url.len()`
+    // responses so might as well pre-allocate
+    // for this to save time and memory
+    let mut res = Vec::with_capacity(urls.len());
+    for resp in resps {
+        res.push(resp.await.map_err(|e| DownloadError::NetworkError(e))?)
     }
+
+    Ok(res)
 }
 
-fn get_filename(root_dir: &PathBuf, filename: Option<String>, headers: HeaderMap) -> PathBuf {
-    let filename = filename.unwrap_or_else(|| {
-        let raw = headers
-            .get(header::CONTENT_DISPOSITION)
-            .unwrap()
-            .to_str()
-            .unwrap();
+fn get_filename(root_dir: &PathBuf, headers: HeaderMap) -> PathBuf {
+    let raw = headers
+        .get(header::CONTENT_DISPOSITION)
+        .unwrap()
+        .to_str()
+        .unwrap();
 
-        let span = raw.match_indices("\"").map(|(i, _s)| i).collect::<Vec<_>>();
-        let start = span[0] + 1;
-        let end = span[1];
-        let disposition = &raw[start..end];
+    let span = raw.match_indices("\"").map(|(i, _s)| i).collect::<Vec<_>>();
+    let start = span[0] + 1;
+    let end = span[1];
+    let disposition = &raw[start..end];
 
-        disposition.to_string()
-    });
-
+    let filename = disposition.to_string();
     root_dir.join(urldecode(filename))
 }
 
