@@ -63,6 +63,7 @@ async fn main() {
 
     println!("Fetching Voice Overs for characters");
     for character in characters {
+        println!("On Character {}", character.name());
         let voice_over_map =
             index::character::get_voice_overs(&character, &mut resource_pool).await;
 
