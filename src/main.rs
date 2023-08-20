@@ -7,7 +7,7 @@ mod downloader;
 mod index;
 mod types;
 
-fn first_run() {
+async fn first_run() {
     // TODO: Replace with INFO logs
     println!("========================================================");
     println!("First Run!");
@@ -84,5 +84,5 @@ fn first_run() {
 
 #[tokio::main]
 async fn main() {
-    first_run();
+    first_run().await;
 }
