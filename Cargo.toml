@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 fern_colored = { version = "0.6.1", features = ["colored"] }
 log = "0.4.19"
-reqwest = { version = "0.11.18", features = ["stream"]}
+reqwest = { version = "0.11.18", features = ["stream"] }
 tokio = { version = "1.29.1", features = ["full"] }
 # herta-lib = { git = "https://github.com/Kiwifuit/herta-lib" }
 herta-lib = { path = "../herta-lib" }
@@ -18,3 +18,11 @@ humantime = "2.1.0"
 serde = { version = "1.0.183", features = ["derive"] }
 soloud = "1.0.5"
 rand = "0.8.5"
+
+[profile.release]
+lto = true
+strip = true
+opt-level = "z"
+debug = false
+panic = "abort"
+codegen-units = 1
