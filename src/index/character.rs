@@ -4,7 +4,7 @@ use crate::types::*;
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
-pub async fn index_characters(resources: &mut Vec<String>) -> Vec<Character> {
+pub async fn index_characters(resources: &mut Vec<Download>) -> Vec<Character> {
     let resp = reqwest::get(CHARACTER_INDEX)
         .await
         .unwrap()
@@ -28,17 +28,25 @@ pub async fn index_characters(resources: &mut Vec<String>) -> Vec<Character> {
 
         character.portrait = Some(portrait);
         character.splash = Some(splash);
-        resources.push(character.portrait.clone().unwrap());
-        resources.push(character.splash.clone().unwrap());
+        resources.push(Download::new(
+            DownloadType::CharacterImage,
+            character.portrait.clone().unwrap(),
+        ));
+        resources.push(Download::new(
+            DownloadType::CharacterImage,
+            character.splash.clone().unwrap(),
+        ));
 
         characters.push(character);
 
+        let rarity = Download::new(DownloadType::CharacterImage, rarity);
         if !resources.contains(&rarity) {
-            resources.push(rarity)
+            resources.push(rarity);
         }
 
+        let ctype = Download::new(DownloadType::CharacterImage, ctype);
         if !resources.contains(&ctype) {
-            resources.push(ctype)
+            resources.push(ctype);
         }
     }
 
@@ -47,14 +55,18 @@ pub async fn index_characters(resources: &mut Vec<String>) -> Vec<Character> {
 
 pub async fn get_voice_overs(
     character: &Character,
-    resources: &mut Vec<String>,
+    resources: &mut Vec<Download>,
 ) -> HashMap<String, String> {
     let url = format!("{}/Voice-Overs/{}", character.link(), "Japanese");
     let mut res = HashMap::with_capacity(12);
     let resp = reqwest::get(url).await.unwrap().text().await.unwrap();
     let raw = herta::extractor::get_voice_overs(resp);
 
-    resources.extend(raw.clone().iter().map(|(_t, src)| src.to_owned()));
+    resources.extend(
+        raw.clone()
+            .iter()
+            .map(|(_t, src)| Download::new(DownloadType::VoiceOver, src.to_owned())),
+    );
     res.extend(raw);
 
     res

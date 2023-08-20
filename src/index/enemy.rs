@@ -2,7 +2,7 @@ use crate::types::*;
 
 const ENEMY_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Category:Enemies";
 
-pub async fn index_enemies(resources: &mut Vec<String>) -> Vec<Enemy> {
+pub async fn index_enemies(resources: &mut Vec<Download>) -> Vec<Enemy> {
     let resp = reqwest::get(ENEMY_INDEX)
         .await
         .unwrap()
@@ -25,7 +25,10 @@ pub async fn index_enemies(resources: &mut Vec<String>) -> Vec<Enemy> {
         enemy.dres_values = herta::extractor::get_enemy_debuff_resistances(html.clone());
         enemy.res_values = herta::extractor::get_enemy_resistances(html);
 
-        resources.push(enemy.portrait.clone());
+        resources.push(Download::new(
+            DownloadType::EnemyImage,
+            enemy.portrait.clone(),
+        ));
         enemies.push(enemy);
     }
 
