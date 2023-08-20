@@ -16,3 +16,4 @@ url = "2.4.0"
 futures-util = "0.3.28"
 humantime = "2.1.0"
 serde = { version = "1.0.183", features = ["derive"] }
+soloud = "1.0.5"
