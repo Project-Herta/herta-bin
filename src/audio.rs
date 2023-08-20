@@ -20,10 +20,14 @@ pub fn play_voice_over(player: &Soloud, vo_type: VoiceOverType) {
         let audio_file = audio_root.join(get_audio_file(character, &vo_type));
         let mut audio_chosen = audio::Wav::default();
 
-        match audio_chosen.load(audio_file) {
+        match audio_chosen.load(&audio_file) {
             Ok(_) => break,
             Err(e) => {
-                eprintln!("An error occurred while trying to play audio: {}", e)
+                eprintln!(
+                    "An error occurred while trying to play audio {:?}: {}",
+                    audio_file.display(),
+                    e
+                )
             }
         }
     }
