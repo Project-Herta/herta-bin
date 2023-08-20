@@ -1,11 +1,11 @@
 use humantime::format_duration;
 use std::time::Instant;
 
+mod audio;
 mod data;
 mod downloader;
 mod index;
 mod types;
-mod audio
 
 fn first_run() {
     // TODO: Replace with INFO logs
