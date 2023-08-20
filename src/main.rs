@@ -67,7 +67,7 @@ async fn main() {
         let voice_over_map =
             index::character::get_voice_overs(&character, &mut resource_pool).await;
 
-        dbg!(voice_over_map);
+        // dbg!(voice_over_map);
         data::write_character(&character);
     }
 
@@ -79,5 +79,5 @@ async fn main() {
     println!("{} resource(s) to be downloaded", &resource_pool.len());
     let (download_total, downloads) = downloader::download_image(&resource_pool).await.unwrap();
 
-    dbg!(downloads);
+    // dbg!(downloads);
 }
