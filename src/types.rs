@@ -1,7 +1,43 @@
 use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
+use crate::downloader::Downloadable;
+
 const STAR_CHAR: &str = "✦";
+
+pub struct Download {
+    dl_type: DownloadType,
+    url: String,
+}
+
+pub enum DownloadType {
+    CharacterImage,
+    EnemyImage,
+    VoiceOver,
+}
+
+impl Downloadable for Download {
+    fn base_dir(&self) -> std::path::PathBuf {
+        std::path::PathBuf::from(match self.dl_type {
+            DownloadType::CharacterImage => "characters/",
+            DownloadType::EnemyImage => "enemies/",
+            DownloadType::VoiceOver => "voice-over/",
+        })
+    }
+
+    fn url(&self) -> String {
+        self.url
+    }
+}
+
+impl Download {
+    pub fn new(download_type: DownloadType, url: String) -> Self {
+        Self {
+            dl_type: download_type,
+            url
+        }
+    }
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Enemy {
