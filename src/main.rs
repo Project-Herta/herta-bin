@@ -85,7 +85,11 @@ async fn first_run() {
 
 #[tokio::main]
 async fn main() {
-    first_run().await;
+    let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
+
+    if !root_dir.exists() {
+        first_run().await
+    }
 
     let player = soloud::Soloud::default().unwrap();
     audio::play_voice_over(&player, audio::VoiceOverType::Greeting);

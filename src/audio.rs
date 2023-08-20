@@ -21,7 +21,13 @@ pub fn play_voice_over(player: &Soloud, vo_type: VoiceOverType) {
         let mut audio_chosen = audio::Wav::default();
 
         match audio_chosen.load(&audio_file) {
-            Ok(_) => break,
+            Ok(_) => {
+                println!("Playing {}'s voiceline", character);
+                player.play(&audio_chosen);
+
+                wait_until_finished(player);
+                break;
+            }
             Err(e) => {
                 eprintln!(
                     "An error occurred while trying to play audio {:?}: {}",
@@ -31,8 +37,6 @@ pub fn play_voice_over(player: &Soloud, vo_type: VoiceOverType) {
             }
         }
     }
-
-    wait_until_finished(player);
 }
 
 fn get_audio_file(character: &String, vo_type: &VoiceOverType) -> PathBuf {
@@ -59,7 +63,11 @@ fn list_characters() -> Vec<String> {
         let character_raw = character_raw.unwrap();
         let character = character_raw.file_name();
 
-        res.push(String::from(character.to_string_lossy()))
+        if character_raw.path().extension().unwrap() == "json" {
+            res.push(String::from(
+                character.to_string_lossy().strip_suffix(".json").unwrap(),
+            ))
+        }
     }
 
     res
