@@ -5,13 +5,13 @@ use crate::downloader::Downloadable;
 
 const STAR_CHAR: &str = "✦";
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub struct Download {
     dl_type: DownloadType,
     url: String,
 }
 
-#[derive(PartialEq)]
+#[derive(PartialEq, Clone)]
 pub enum DownloadType {
     CharacterImage,
     EnemyImage,

@@ -8,7 +8,7 @@ use std::fs::{create_dir_all, metadata, OpenOptions};
 use std::io::{self, prelude::*};
 use std::path::PathBuf;
 
-pub trait Downloadable {
+pub trait Downloadable: Clone {
     fn url(&self) -> String;
 
     fn base_dir(&self) -> PathBuf;
@@ -32,22 +32,23 @@ where
 
     let resps = get(urls).await?;
     let mut downloaded_total = 0;
-    let root_dir = herta::data::get_root_dir(
-        env!("CARGO_BIN_NAME"),
-        Some(format!(
-            "{}/{}",
-            env!("CARGO_PKG_VERSION_MAJOR"),
-            urls.get(0).unwrap().base_dir().display()
-        )),
-    );
-
-    #[allow(unused_must_use)]
-    if !root_dir.exists() {
-        create_dir_all(&root_dir);
-    }
 
     let mut downloaded_files = vec![];
-    for resp in resps {
+    for (resp, download) in resps {
+        let root_dir = herta::data::get_root_dir(
+            env!("CARGO_BIN_NAME"),
+            Some(format!(
+                "{}/{}",
+                env!("CARGO_PKG_VERSION_MAJOR"),
+                download.base_dir().display()
+            )),
+        );
+
+        #[allow(unused_must_use)]
+        if !root_dir.exists() {
+            create_dir_all(&root_dir);
+        }
+
         let headers = resp.headers().clone();
         let mut stream = resp.bytes_stream();
 
@@ -80,19 +81,22 @@ where
     Ok((downloaded_total, downloaded_files))
 }
 
-async fn get<'a, D>(urls: &'a Vec<D>) -> Result<Vec<Response>, DownloadError>
+async fn get<'a, D>(urls: &'a Vec<D>) -> Result<Vec<(Response, &'a D)>, DownloadError>
 where
     D: 'a,
     &'a D: Downloadable,
 {
-    let resps = urls.iter().map(|i| reqwest::get(i.url()));
+    let resps = urls.iter().map(|i| (reqwest::get(i.url()), i));
 
     // We're gonna have at most `url.len()`
     // responses so might as well pre-allocate
     // for this to save time and memory
     let mut res = Vec::with_capacity(urls.len());
-    for resp in resps {
-        res.push(resp.await.map_err(|e| DownloadError::NetworkError(e))?)
+    for (resp, download) in resps {
+        res.push((
+            resp.await.map_err(|e| DownloadError::NetworkError(e))?,
+            download.clone(),
+        ))
     }
 
     Ok(res)
