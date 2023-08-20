@@ -95,4 +95,8 @@ async fn main() {
     audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
     println!("This is a temp line, would be removed in the future");
     audio::play_voice_over(&player, audio::VoiceOverType::Parting);
+
+    // FIXME: This shouldnt be here in 1.0.0
+    eprintln!("Press CTRL + C to exit...");
+    loop {}
 }
