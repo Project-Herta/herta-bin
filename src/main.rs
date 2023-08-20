@@ -1,5 +1,5 @@
 use humantime::format_duration;
-use std::{fs::OpenOptions, time::Instant};
+use std::time::Instant;
 
 mod data;
 mod downloader;
