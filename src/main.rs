@@ -6,8 +6,7 @@ mod downloader;
 mod index;
 mod types;
 
-#[tokio::main]
-async fn main() {
+fn first_run() {
     // TODO: Replace with INFO logs
     println!("========================================================");
     println!("First Run!");
@@ -80,4 +79,9 @@ async fn main() {
     let (download_total, downloads) = downloader::download_image(&resource_pool).await.unwrap();
 
     // dbg!(downloads);
+}
+
+#[tokio::main]
+async fn main() {
+    first_run();
 }
