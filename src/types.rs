@@ -28,7 +28,21 @@ impl Downloadable for Download {
     }
 
     fn url(&self) -> String {
-        self.url
+        String::from(&self.url)
+    }
+}
+
+impl Downloadable for &Download {
+    fn base_dir(&self) -> std::path::PathBuf {
+        std::path::PathBuf::from(match self.dl_type {
+            DownloadType::CharacterImage => "characters/",
+            DownloadType::EnemyImage => "enemies/",
+            DownloadType::VoiceOver => "voice-over/",
+        })
+    }
+
+    fn url(&self) -> String {
+        String::from(&self.url)
     }
 }
 
