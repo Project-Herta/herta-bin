@@ -19,5 +19,12 @@ pub fn write_character(character: &Character) {
         .open(filename)
         .unwrap();
 
-    herta::data::write_config(&mut file, character);
+    // TODO: Remove this warning below
+    // when we start caring for this
+    // guy's return type, because we should
+    // someday
+    #[allow(unused_must_use)]
+    {
+        herta::data::write_config(&mut file, character);
+    }
 }
