@@ -62,12 +62,26 @@ pub async fn get_voice_overs(
     let resp = reqwest::get(url).await.unwrap().text().await.unwrap();
     let raw = herta::extractor::get_voice_overs(resp);
 
-    resources.extend(
-        raw.clone()
-            .iter()
-            .map(|(_t, src)| Download::new(DownloadType::VoiceOver, src.to_owned())),
-    );
-    res.extend(raw);
+    resources.extend(raw.clone().iter().filter_map(|(vo_type, src)| {
+        if filter_voice_overs(vo_type) {
+            Some(Download::new(DownloadType::VoiceOver, src.to_owned()))
+        } else {
+            None
+        }
+    }));
+
+    res.extend(raw.iter().filter_map(|(vo_type, url)| {
+        if filter_voice_overs(vo_type) {
+            Some((vo_type.to_owned(), url.to_owned()))
+        } else {
+            None
+        }
+    }));
 
     res
+}
+
+fn filter_voice_overs(vo_type: &String) -> bool {
+    // vo_data.0 would be the "Voiceover tag/type"
+    vo_type == "Greeting" || vo_type == "Parting"
 }
