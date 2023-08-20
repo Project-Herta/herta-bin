@@ -435,6 +435,7 @@ dependencies = [
  "herta-lib",
  "humantime",
  "log",
+ "rand",
  "reqwest",
  "serde",
  "soloud",
