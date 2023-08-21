@@ -13,20 +13,26 @@ pub struct Download {
     url: String,
 }
 
-#[derive(PartialEq, Clone)]
+#[derive(PartialEq, Clone, Copy)]
 pub enum DownloadType {
     CharacterImage,
     EnemyImage,
     VoiceOver,
 }
 
-impl Downloadable for Download {
-    fn base_dir(&self) -> std::path::PathBuf {
-        std::path::PathBuf::from(match self.dl_type {
+impl Into<PathBuf> for DownloadType {
+    fn into(self) -> PathBuf {
+        std::path::PathBuf::from(match self {
             DownloadType::CharacterImage => "images/characters/",
             DownloadType::EnemyImage => "images/enemies/",
             DownloadType::VoiceOver => "voice-overs/",
         })
+    }
+}
+
+impl Downloadable for Download {
+    fn base_dir(&self) -> std::path::PathBuf {
+        self.dl_type.into()
     }
 
     fn url(&self) -> String {
@@ -36,11 +42,7 @@ impl Downloadable for Download {
 
 impl Downloadable for &Download {
     fn base_dir(&self) -> std::path::PathBuf {
-        std::path::PathBuf::from(match self.dl_type {
-            DownloadType::CharacterImage => "images/characters/",
-            DownloadType::EnemyImage => "images/enemies/",
-            DownloadType::VoiceOver => "voice-overs/",
-        })
+        self.dl_type.into()
     }
 
     fn url(&self) -> String {
