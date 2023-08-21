@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::any::Any;
 use std::fmt::Display;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 use crate::downloader::Downloadable;
 
@@ -20,9 +20,19 @@ pub enum DownloadType {
     VoiceOver,
 }
 
+impl AsRef<Path> for DownloadType {
+    fn as_ref(&self) -> &Path {
+        &Path::new(match self {
+            DownloadType::CharacterImage => "images/characters/",
+            DownloadType::EnemyImage => "images/enemies/",
+            DownloadType::VoiceOver => "voice-overs/",
+        })
+    }
+}
+
 impl Into<PathBuf> for DownloadType {
     fn into(self) -> PathBuf {
-        std::path::PathBuf::from(match self {
+        PathBuf::from(match self {
             DownloadType::CharacterImage => "images/characters/",
             DownloadType::EnemyImage => "images/enemies/",
             DownloadType::VoiceOver => "voice-overs/",
