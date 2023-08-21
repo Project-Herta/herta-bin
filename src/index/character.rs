@@ -29,22 +29,22 @@ pub async fn index_characters(resources: &mut Vec<Download>) -> Vec<Character> {
         character.portrait = Some(portrait);
         character.splash = Some(splash);
         resources.push(Download::new(
-            DownloadType::CharacterImage,
+            DownloadType::CharacterPortrait,
             character.portrait.clone().unwrap(),
         ));
         resources.push(Download::new(
-            DownloadType::CharacterImage,
+            DownloadType::CharacterSplash,
             character.splash.clone().unwrap(),
         ));
 
         characters.push(character);
 
-        let rarity = Download::new(DownloadType::CharacterImage, rarity);
+        let rarity = Download::new(DownloadType::CharacterRarity, rarity);
         if !resources.contains(&rarity) {
             resources.push(rarity);
         }
 
-        let ctype = Download::new(DownloadType::CharacterImage, ctype);
+        let ctype = Download::new(DownloadType::CharacterCombatType, ctype);
         if !resources.contains(&ctype) {
             resources.push(ctype);
         }
