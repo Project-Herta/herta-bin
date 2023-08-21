@@ -92,7 +92,8 @@ async fn main() {
     }
 
     let player = soloud::Soloud::default().unwrap();
-    audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
+    // Tryna decide if we should even have a greeting voice over
+    // audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
     println!("This is a temp line, would be removed in the future");
     audio::play_voice_over(&player, audio::VoiceOverType::Parting);
 
