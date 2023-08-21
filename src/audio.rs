@@ -11,8 +11,8 @@ pub enum VoiceOverType {
 pub fn play_voice_over(player: &Soloud, vo_type: VoiceOverType) {
     let audio_root = herta::data::get_root_dir(
         env!("CARGO_BIN_NAME"),
-        Some(format!("{}/voice-overs", env!("CARGO_PKG_VERSION_MAJOR"),)),
-    );
+        Some(env!("CARGO_PKG_VERSION_MAJOR")),
+    ).join("voice-overs");
 
     loop {
         let character_list = list_characters();
@@ -42,7 +42,7 @@ pub fn play_voice_over(player: &Soloud, vo_type: VoiceOverType) {
 fn get_audio_file(character: &String, vo_type: &VoiceOverType) -> PathBuf {
     PathBuf::from(format!(
         "VO_JA_Archive_{}_{}.ogg",
-        character,
+        character.replace(" ", "_"),
         match vo_type {
             VoiceOverType::Greeting => 2,
             VoiceOverType::Parting => 3,
