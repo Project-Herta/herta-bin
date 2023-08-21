@@ -76,7 +76,9 @@ async fn first_run() {
 
     // dbg!(&resource_pool);
     println!("{} resource(s) to be downloaded", &resource_pool.len());
-    let (download_total, downloads) = downloader::download_resources(&resource_pool).await.unwrap();
+    let (download_total, downloads) = downloader::download_resources(&resource_pool)
+        .await
+        .unwrap();
 
     println!("Everything's ready, starting...")
     // dbg!(downloads);

@@ -82,6 +82,5 @@ pub async fn get_voice_overs(
 }
 
 fn filter_voice_overs(vo_type: &String) -> bool {
-    // vo_data.0 would be the "Voiceover tag/type"
-    vo_type == "Greeting" || vo_type == "Parting"
+    vo_type == "Parting"
 }

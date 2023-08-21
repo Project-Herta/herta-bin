@@ -4,7 +4,6 @@ use soloud::{audio, AudioExt, LoadExt, Soloud};
 use std::{fs::read_dir, path::PathBuf};
 
 pub enum VoiceOverType {
-    Greeting,
     Parting,
 }
 
@@ -45,7 +44,6 @@ fn get_audio_file(character: &String, vo_type: &VoiceOverType) -> PathBuf {
         "VO_JA_Archive_{}_{}.ogg",
         character.replace(" ", "_"),
         match vo_type {
-            VoiceOverType::Greeting => 2,
             VoiceOverType::Parting => 3,
         }
     ))
