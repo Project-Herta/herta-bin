@@ -446,6 +446,7 @@ dependencies = [
 [[package]]
 name = "herta-lib"
 version = "0.1.0"
+source = "git+https://github.com/Project-Herta/herta-lib#421102e62087445156fb0731b8bcd79a7785701e"
 dependencies = [
  "platform-dirs",
  "scraper",
