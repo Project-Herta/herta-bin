@@ -1,8 +1,9 @@
 use serde::{Deserialize, Serialize};
+use std::any::Any;
 use std::fmt::Display;
+use std::path::PathBuf;
 
 use crate::downloader::Downloadable;
-use std::any::Any;
 
 const STAR_CHAR: &str = "✦";
 
@@ -58,13 +59,13 @@ impl Download {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Enemy {
-    pub name: String,
-    pub link: String,
-    pub res_values: Vec<u8>,
-    pub dres_values: Vec<u8>, // Debuff RES
+    name: String,
+    link: String,
+    res_values: Vec<u8>,
+    dres_values: Vec<u8>, // Debuff RES
 
     #[serde(skip_serializing_if = "skip")]
-    pub portrait: String,
+    pub portrait_url: String,
 }
 
 impl From<herta::extractor::Enemy> for Enemy {
@@ -72,10 +73,36 @@ impl From<herta::extractor::Enemy> for Enemy {
         Self {
             link: value.link,
             name: value.name,
-            portrait: String::new(),
+            portrait_url: String::new(),
             res_values: vec![],
             dres_values: vec![],
         }
+    }
+}
+
+impl Enemy {
+    pub fn name(&self) -> &String {
+        &self.name
+    }
+
+    pub fn link(&self) -> &String {
+        &self.link
+    }
+
+    pub fn res_values(&self) -> &Vec<u8> {
+        &self.res_values
+    }
+
+    pub fn dres_values(&self) -> &Vec<u8> {
+        &self.dres_values
+    }
+
+    pub fn set_dres_values(&mut self, values: Vec<u8>) {
+        self.dres_values.extend(values);
+    }
+
+    pub fn set_res_values(&mut self, values: Vec<u8>) {
+        self.res_values.extend(values);
     }
 }
 

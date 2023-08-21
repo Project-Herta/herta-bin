@@ -14,20 +14,20 @@ pub async fn index_enemies(resources: &mut Vec<Download>) -> Vec<Enemy> {
 
     for enemy in herta::extractor::index_enemies(resp) {
         let mut enemy: Enemy = enemy.into();
-        let html = reqwest::get(&enemy.link)
+        let html = reqwest::get(enemy.link())
             .await
             .unwrap()
             .text()
             .await
             .unwrap();
 
-        enemy.portrait = herta::extractor::get_enemy_portrait(html.clone());
-        enemy.dres_values = herta::extractor::get_enemy_debuff_resistances(html.clone());
-        enemy.res_values = herta::extractor::get_enemy_resistances(html);
+        enemy.portrait_url = herta::extractor::get_enemy_portrait(html.clone());
+        enemy.set_dres_values(herta::extractor::get_enemy_debuff_resistances(html.clone()));
+        enemy.set_res_values(herta::extractor::get_enemy_resistances(html));
 
         resources.push(Download::new(
             DownloadType::EnemyImage,
-            enemy.portrait.clone(),
+            enemy.portrait_url.clone(),
         ));
         enemies.push(enemy);
     }

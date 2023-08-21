@@ -40,7 +40,7 @@ pub fn write_enemy(enemy: &Enemy) {
         create_dir_all(&root_dir);
     }
 
-    let filename = root_dir.join(format!("{}.json", enemy.name));
+    let filename = root_dir.join(format!("{}.json", enemy.name()));
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
