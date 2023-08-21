@@ -66,7 +66,6 @@ async fn first_run() {
         let voice_over_map =
             index::character::get_voice_overs(&character, &mut resource_pool).await;
 
-        // dbg!(voice_over_map);
         data::write_character(&character);
     }
 
@@ -74,14 +73,12 @@ async fn first_run() {
         data::write_enemy(&enemy);
     }
 
-    // dbg!(&resource_pool);
     println!("{} resource(s) to be downloaded", &resource_pool.len());
     let (download_total, downloads) = downloader::download_resources(&resource_pool)
         .await
         .unwrap();
 
     println!("Everything's ready, starting...")
-    // dbg!(downloads);
 }
 
 #[tokio::main]
