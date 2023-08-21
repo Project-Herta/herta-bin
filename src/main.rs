@@ -63,7 +63,6 @@ async fn first_run() {
 
     println!("Fetching Voice Overs for characters");
     for character in characters {
-        println!("On Character {}", character.name());
         let voice_over_map =
             index::character::get_voice_overs(&character, &mut resource_pool).await;
 
@@ -71,9 +70,9 @@ async fn first_run() {
         data::write_character(&character);
     }
 
-    // for enemy in enemies {
-    //     dbg!(enemy);
-    // }
+    for enemy in enemies {
+        data::write_enemy(&enemy);
+    }
 
     // dbg!(&resource_pool);
     println!("{} resource(s) to be downloaded", &resource_pool.len());
