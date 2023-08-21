@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 use std::fmt::Display;
 
 use crate::downloader::Downloadable;
+use std::any::Any;
 
 const STAR_CHAR: &str = "✦";
 
@@ -93,7 +94,7 @@ pub struct Character {
     pub portrait: Option<String>,
 }
 
-fn skip(_: &Option<String>) -> bool {
+fn skip<A: Any>(_: &A) -> bool {
     true
 }
 
