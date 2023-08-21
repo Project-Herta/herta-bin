@@ -17,7 +17,7 @@ async fn first_run() {
     println!("This procedure will take a while (including downloads)");
     println!("========================================================");
 
-    let scraping_time = Instant::now();
+    let start_time = Instant::now();
     let mut resource_pool = vec![];
     let enemies = tokio::spawn(async {
         let mut resource_pool = vec![];
@@ -46,7 +46,7 @@ async fn first_run() {
             break;
         }
     }
-    let scraping_elapsed = scraping_time.elapsed();
+    let scraping_elapsed = start_time.elapsed();
     println!("Took {}", format_duration(scraping_elapsed));
 
     let (enemies, enemies_resources) = enemies.await.unwrap();
@@ -77,6 +77,8 @@ async fn first_run() {
     let (download_total, downloads) = downloader::download_resources(&resource_pool)
         .await
         .unwrap();
+    let download = start_time.elapsed();
+    println!("First run took {}", format_duration(download));
 
     println!("Everything's ready, starting...")
 }
