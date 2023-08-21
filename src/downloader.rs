@@ -21,7 +21,9 @@ pub enum DownloadError {
     NothingToDownload,
 }
 
-pub async fn download_resources<'a, U>(urls: &'a Vec<U>) -> Result<(usize, Vec<PathBuf>), DownloadError>
+pub async fn download_resources<'a, U>(
+    urls: &'a Vec<U>,
+) -> Result<(u64, Vec<PathBuf>), DownloadError>
 where
     U: Downloadable + 'a,
     &'a U: Downloadable,
@@ -67,7 +69,7 @@ where
 
         while let Some(chunk) = stream.next().await {
             let bytes = chunk.unwrap();
-            downloaded_total += bytes.len();
+            downloaded_total += bytes.len() as u64;
 
             savefile
                 .write(&bytes)

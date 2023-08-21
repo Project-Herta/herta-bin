@@ -1,3 +1,4 @@
+use humansize::{format_size, FormatSizeOptions};
 use humantime::format_duration;
 use std::time::Instant;
 
@@ -78,7 +79,13 @@ async fn first_run() {
         .await
         .unwrap();
     let download = start_time.elapsed();
-    println!("First run took {}", format_duration(download));
+    let ops = FormatSizeOptions::default();
+    let download_total_size = format_size(download_total, ops);
+    println!(
+        "First run took {}, {} downloaded",
+        format_duration(download),
+        download_total_size
+    );
 
     println!("Everything's ready, starting...")
 }
