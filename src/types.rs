@@ -15,7 +15,10 @@ pub struct Download {
 
 #[derive(PartialEq, Clone, Copy)]
 pub enum DownloadType {
-    CharacterImage,
+    CharacterPortrait,
+    CharacterSplash,
+    CharacterRarity,
+    CharacterCombatType,
     EnemyImage,
     VoiceOver,
 }
@@ -23,7 +26,10 @@ pub enum DownloadType {
 impl AsRef<Path> for DownloadType {
     fn as_ref(&self) -> &Path {
         &Path::new(match self {
-            DownloadType::CharacterImage => "images/characters/",
+            DownloadType::CharacterPortrait => "images/characters/portrait",
+            DownloadType::CharacterSplash => "images/characters/splash",
+            DownloadType::CharacterRarity => "images/characters/rarity",
+            DownloadType::CharacterCombatType => "images/characters/ctype",
             DownloadType::EnemyImage => "images/enemies/",
             DownloadType::VoiceOver => "voice-overs/",
         })
@@ -33,7 +39,10 @@ impl AsRef<Path> for DownloadType {
 impl Into<PathBuf> for DownloadType {
     fn into(self) -> PathBuf {
         PathBuf::from(match self {
-            DownloadType::CharacterImage => "images/characters/",
+            DownloadType::CharacterPortrait => "images/characters/portrait",
+            DownloadType::CharacterSplash => "images/characters/splash",
+            DownloadType::CharacterRarity => "images/characters/rarity",
+            DownloadType::CharacterCombatType => "images/characters/ctype",
             DownloadType::EnemyImage => "images/enemies/",
             DownloadType::VoiceOver => "voice-overs/",
         })
