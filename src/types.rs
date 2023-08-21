@@ -59,9 +59,11 @@ impl Download {
 pub struct Enemy {
     pub name: String,
     pub link: String,
-    pub portrait: String,
     pub res_values: Vec<u8>,
-    pub dres_values: Vec<u8>, // Effect RES
+    pub dres_values: Vec<u8>, // Debuff RES
+
+    #[serde(skip_serializing_if = "skip")]
+    pub portrait: String,
 }
 
 impl From<herta::extractor::Enemy> for Enemy {
