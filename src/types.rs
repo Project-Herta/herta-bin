@@ -21,9 +21,9 @@ pub enum DownloadType {
 impl Downloadable for Download {
     fn base_dir(&self) -> std::path::PathBuf {
         std::path::PathBuf::from(match self.dl_type {
-            DownloadType::CharacterImage => "characters/",
-            DownloadType::EnemyImage => "enemies/",
-            DownloadType::VoiceOver => "voice-over/",
+            DownloadType::CharacterImage => "images/characters/",
+            DownloadType::EnemyImage => "images/enemies/",
+            DownloadType::VoiceOver => "voice-overs/",
         })
     }
 
@@ -35,9 +35,9 @@ impl Downloadable for Download {
 impl Downloadable for &Download {
     fn base_dir(&self) -> std::path::PathBuf {
         std::path::PathBuf::from(match self.dl_type {
-            DownloadType::CharacterImage => "characters/",
-            DownloadType::EnemyImage => "enemies/",
-            DownloadType::VoiceOver => "voice-over/",
+            DownloadType::CharacterImage => "images/characters/",
+            DownloadType::EnemyImage => "images/enemies/",
+            DownloadType::VoiceOver => "voice-overs/",
         })
     }
 

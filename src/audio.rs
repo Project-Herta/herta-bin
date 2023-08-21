@@ -11,7 +11,7 @@ pub enum VoiceOverType {
 pub fn play_voice_over(player: &Soloud, vo_type: VoiceOverType) {
     let audio_root = herta::data::get_root_dir(
         env!("CARGO_BIN_NAME"),
-        Some(format!("{}/voice-over", env!("CARGO_PKG_VERSION_MAJOR"),)),
+        Some(format!("{}/voice-overs", env!("CARGO_PKG_VERSION_MAJOR"),)),
     );
 
     loop {
