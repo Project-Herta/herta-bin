@@ -21,10 +21,10 @@ pub enum DownloadError {
     NothingToDownload,
 }
 
-pub async fn download_image<'a, I>(urls: &'a Vec<I>) -> Result<(usize, Vec<PathBuf>), DownloadError>
+pub async fn download_resources<'a, U>(urls: &'a Vec<U>) -> Result<(usize, Vec<PathBuf>), DownloadError>
 where
-    I: Downloadable + 'a,
-    &'a I: Downloadable,
+    U: Downloadable + 'a,
+    &'a U: Downloadable,
 {
     if urls.is_empty() {
         return Err(DownloadError::NothingToDownload);
