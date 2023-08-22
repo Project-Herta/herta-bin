@@ -9,11 +9,7 @@ use std::fs::{create_dir_all, metadata, OpenOptions};
 use std::io::{self, prelude::*};
 use std::path::PathBuf;
 
-pub trait Downloadable: Clone {
-    fn url(&self) -> String;
-
-    fn base_dir(&self) -> PathBuf;
-}
+use crate::types::Download;
 
 #[derive(Debug)]
 pub enum DownloadError {
@@ -22,13 +18,9 @@ pub enum DownloadError {
     NothingToDownload,
 }
 
-pub async fn download_resources<'a, U>(
-    urls: &'a Vec<U>,
-) -> Result<(u64, Vec<PathBuf>), DownloadError>
-where
-    U: Downloadable + 'a,
-    &'a U: Downloadable,
-{
+pub async fn download_resources(
+    urls: &Vec<Download>,
+) -> Result<(u64, Vec<PathBuf>), DownloadError> {
     if urls.is_empty() {
         return Err(DownloadError::NothingToDownload);
     }
@@ -85,11 +77,7 @@ where
     Ok((downloaded_total, downloaded_files))
 }
 
-async fn get<'a, D>(urls: &'a Vec<D>) -> Result<Vec<(Response, &'a D)>, DownloadError>
-where
-    D: 'a,
-    &'a D: Downloadable,
-{
+async fn get(urls: &Vec<Download>) -> Result<Vec<(Response, Download)>, DownloadError> {
     let resps = urls.iter().map(|i| (reqwest::get(i.url()), i));
 
     // We're gonna have at most `url.len()`

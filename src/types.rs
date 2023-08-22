@@ -3,8 +3,6 @@ use std::any::Any;
 use std::fmt::Display;
 use std::path::{Path, PathBuf};
 
-use crate::downloader::Downloadable;
-
 const STAR_CHAR: &str = "✦";
 
 #[derive(PartialEq, Clone)]
@@ -50,26 +48,6 @@ impl Into<PathBuf> for DownloadType {
     }
 }
 
-impl Downloadable for Download {
-    fn base_dir(&self) -> std::path::PathBuf {
-        self.dl_type.into()
-    }
-
-    fn url(&self) -> String {
-        String::from(&self.url)
-    }
-}
-
-impl Downloadable for &Download {
-    fn base_dir(&self) -> std::path::PathBuf {
-        self.dl_type.into()
-    }
-
-    fn url(&self) -> String {
-        String::from(&self.url)
-    }
-}
-
 impl Download {
     pub fn new(download_type: DownloadType, url: String) -> Self {
         Self {
@@ -79,8 +57,16 @@ impl Download {
         }
     }
 
-    fn mark_downloaded(&mut self, file: PathBuf) {
+    pub fn mark_downloaded(&mut self, file: PathBuf) {
         self.file = Some(file);
+    }
+
+    pub fn base_dir(&self) -> std::path::PathBuf {
+        self.dl_type.into()
+    }
+
+    pub fn url(&self) -> String {
+        String::from(&self.url)
     }
 }
 
