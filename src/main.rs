@@ -1,7 +1,7 @@
 use humansize::{format_size, FormatSizeOptions};
 use humantime::format_duration;
 use log::info;
-use std::{process::exit, time::Instant};
+use std::time::Instant;
 
 mod audio;
 mod data;

@@ -110,14 +110,6 @@ impl Enemy {
         &self.link
     }
 
-    pub fn res_values(&self) -> &Vec<u8> {
-        &self.res_values
-    }
-
-    pub fn dres_values(&self) -> &Vec<u8> {
-        &self.dres_values
-    }
-
     pub fn set_dres_values(&mut self, values: Vec<u8>) {
         self.dres_values.extend(values);
     }
@@ -147,18 +139,6 @@ fn skip<A: Any>(_: &A) -> bool {
 }
 
 impl Character {
-    pub fn rarity(&self) -> &u8 {
-        &self.rarity
-    }
-
-    pub fn path(&self) -> &CharacterPath {
-        &self.path
-    }
-
-    pub fn combat_type(&self) -> &CharacterCType {
-        &self.combat_type
-    }
-
     pub fn name(&self) -> &String {
         &self.name
     }

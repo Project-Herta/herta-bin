@@ -1,10 +1,8 @@
-use std::fmt::Display;
-
 use fern_colored::{
     colors::{Color, ColoredLevelConfig},
     Dispatch,
 };
-use log::{Level, Record};
+use log::Record;
 
 pub fn setup() {
     let color_config = ColoredLevelConfig::new()
