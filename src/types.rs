@@ -68,6 +68,10 @@ impl Download {
     pub fn url(&self) -> String {
         String::from(&self.url)
     }
+
+    fn is_downloaded(&self) -> bool {
+        self.file.is_some()
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -76,6 +80,8 @@ pub struct Enemy {
     link: String,
     res_values: Vec<u8>,
     dres_values: Vec<u8>, // Debuff RES
+
+    resources: Vec<Download>,
 
     #[serde(skip_serializing_if = "skip")]
     pub portrait_url: String,
@@ -89,6 +95,7 @@ impl From<herta::extractor::Enemy> for Enemy {
             portrait_url: String::new(),
             res_values: vec![],
             dres_values: vec![],
+            resources: vec![],
         }
     }
 }
@@ -109,6 +116,16 @@ impl Enemy {
     pub fn set_res_values(&mut self, values: Vec<u8>) {
         self.res_values.extend(values);
     }
+
+    pub fn add_resource(&mut self, resource: Download) -> Result<(), ()> {
+        if !resource.is_downloaded() {
+            Err(())
+        } else {
+            self.resources.push(resource);
+
+            Ok(())
+        }
+    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -118,6 +135,7 @@ pub struct Character {
     rarity: u8,
     path: CharacterPath,
     combat_type: CharacterCType,
+    resources: Vec<Download>,
 
     #[serde(skip_serializing_if = "skip")]
     pub splash: Option<String>,
@@ -137,6 +155,16 @@ impl Character {
 
     pub fn link(&self) -> &String {
         &self.link
+    }
+
+    pub fn add_resource(&mut self, resource: Download) -> Result<(), ()> {
+        if !resource.is_downloaded() {
+            Err(())
+        } else {
+            self.resources.push(resource);
+
+            Ok(())
+        }
     }
 }
 
@@ -159,6 +187,7 @@ impl From<herta::extractor::Character> for Character {
             combat_type: ctype.try_into().unwrap(),
             splash: None,
             portrait: None,
+            resources: vec![],
         }
     }
 }
