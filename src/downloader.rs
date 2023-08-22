@@ -1,4 +1,5 @@
 use futures_util::StreamExt;
+use log::info;
 use reqwest::{
     header::{self, HeaderMap},
     Response,
@@ -67,6 +68,7 @@ where
             .open(&filename)
             .map_err(|e| DownloadError::CreateFileError(e))?;
 
+        info!("Saving to {}...", &filename.display());
         while let Some(chunk) = stream.next().await {
             let bytes = chunk.unwrap();
             downloaded_total += bytes.len() as u64;
