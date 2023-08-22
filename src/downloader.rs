@@ -9,7 +9,13 @@ use std::fs::{create_dir_all, metadata, OpenOptions};
 use std::io::{self, prelude::*};
 use std::path::PathBuf;
 
-use crate::types::Download;
+pub trait Downloadable: Clone {
+    fn url(&self) -> &String;
+
+    fn base_dir(&self) -> PathBuf;
+
+    fn mark_downloaded(&mut self, file: PathBuf);
+}
 
 #[derive(Debug)]
 pub enum DownloadError {
@@ -18,26 +24,23 @@ pub enum DownloadError {
     NothingToDownload,
 }
 
-pub async fn download_resources(
-    urls: &Vec<Download>,
-) -> Result<(u64, Vec<PathBuf>), DownloadError> {
+pub async fn download_resources<'a, D>(urls: &Vec<D>) -> Result<u64, DownloadError>
+where
+    D: Downloadable,
+{
     if urls.is_empty() {
         return Err(DownloadError::NothingToDownload);
     }
 
-    let resps = get(urls).await?;
+    let mut resps = get(urls).await?;
     let mut downloaded_total = 0;
 
-    let mut downloaded_files = vec![];
-    for (resp, download) in resps {
+    for (download, resp) in resps {
         let root_dir = herta::data::get_root_dir(
             env!("CARGO_BIN_NAME"),
-            Some(format!(
-                "{}/{}",
-                env!("CARGO_PKG_VERSION_MAJOR"),
-                download.base_dir().display()
-            )),
-        );
+            Some(env!("CARGO_PKG_VERSION_MAJOR")),
+        )
+        .join(download.base_dir());
 
         #[allow(unused_must_use)]
         if !root_dir.exists() {
@@ -71,13 +74,16 @@ pub async fn download_resources(
         }
 
         let filename = filename.canonicalize().unwrap();
-        downloaded_files.push(filename);
+        (*download).mark_downloaded(filename);
     }
 
-    Ok((downloaded_total, downloaded_files))
+    Ok(downloaded_total)
 }
 
-async fn get(urls: &Vec<Download>) -> Result<Vec<(Response, Download)>, DownloadError> {
+async fn get<'a, D>(urls: &Vec<D>) -> Result<Vec<(D, Response)>, DownloadError>
+where
+    D: Downloadable,
+{
     let resps = urls.iter().map(|i| (reqwest::get(i.url()), i));
 
     // We're gonna have at most `url.len()`
@@ -86,9 +92,9 @@ async fn get(urls: &Vec<Download>) -> Result<Vec<(Response, Download)>, Download
     let mut res = Vec::with_capacity(urls.len());
     for (resp, download) in resps {
         res.push((
-            resp.await.map_err(|e| DownloadError::NetworkError(e))?,
             download.clone(),
-        ))
+            resp.await.map_err(|e| DownloadError::NetworkError(e))?,
+        ));
     }
 
     Ok(res)
