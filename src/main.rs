@@ -1,11 +1,13 @@
 use humansize::{format_size, FormatSizeOptions};
 use humantime::format_duration;
-use std::time::Instant;
+use log::info;
+use std::{process::exit, time::Instant};
 
 mod audio;
 mod data;
 mod downloader;
 mod index;
+mod logger;
 mod types;
 
 async fn first_run() {
@@ -92,6 +94,8 @@ async fn first_run() {
 
 #[tokio::main]
 async fn main() {
+    logger::setup();
+
     let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
 
     if !root_dir.exists() {
