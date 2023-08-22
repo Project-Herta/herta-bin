@@ -5,14 +5,14 @@ use std::path::{Path, PathBuf};
 
 const STAR_CHAR: &str = "✦";
 
-#[derive(PartialEq, Clone)]
+#[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Download {
     dl_type: DownloadType,
     url: String,
     file: Option<PathBuf>,
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
 pub enum DownloadType {
     CharacterPortrait,
     CharacterSplash,
