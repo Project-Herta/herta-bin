@@ -19,12 +19,16 @@ pub fn setup() {
             out.finish(format_args!(
                 "\x1B[{}m[{}:{}]\x1B[0m [{}] {}",
                 Color::Black.to_fg_str(),
-                record.module_path_static().unwrap_or("<unknown>"),
+                record.module_path().unwrap_or("<unknown>"),
                 record.line().unwrap_or(u32::MAX),
                 wrap_color(record, &color_config),
                 msg,
             ))
         })
+        .level(log::LevelFilter::Info)
+        .level_for("html5ever", log::LevelFilter::Off)
+        .level_for("selectors", log::LevelFilter::Off)
+        .level_for("reqwest", log::LevelFilter::Off)
         .chain(std::io::stdout())
         .apply()
         .expect("Expected for logger to be created");

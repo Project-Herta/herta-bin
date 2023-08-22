@@ -12,13 +12,13 @@ mod types;
 
 async fn first_run() {
     // TODO: Replace with INFO logs
-    println!("========================================================");
-    println!("First Run!");
-    println!("Resources will be indexed and downloaded for faster");
-    println!("startup times in the future");
-    println!("");
-    println!("This procedure will take a while (including downloads)");
-    println!("========================================================");
+    info!("========================================================");
+    info!("First Run!");
+    info!("Resources will be indexed and downloaded for faster");
+    info!("startup times in the future");
+    info!("");
+    info!("This procedure will take a while (including downloads)");
+    info!("========================================================");
 
     let start_time = Instant::now();
     let mut resource_pool = vec![];
@@ -40,7 +40,7 @@ async fn first_run() {
         )
     });
 
-    println!("Waiting for both tasks to finish");
+    info!("Waiting for both tasks to finish");
     loop {
         let enemies_task_is_finished = enemies.is_finished();
         let characters_task_is_finished = characters.is_finished();
@@ -50,7 +50,7 @@ async fn first_run() {
         }
     }
     let scraping_elapsed = start_time.elapsed();
-    println!("Took {}", format_duration(scraping_elapsed));
+    info!("Took {}", format_duration(scraping_elapsed));
 
     let (enemies, enemies_resources) = enemies.await.unwrap();
     let (characters, characters_resources) = characters.await.unwrap();
@@ -58,13 +58,13 @@ async fn first_run() {
     resource_pool.extend(enemies_resources);
     resource_pool.extend(characters_resources);
 
-    println!(
+    info!(
         "Indexed {} characters, {} enemies",
         characters.len(),
         enemies.len()
     );
 
-    println!("Fetching Voice Overs for characters");
+    info!("Fetching Voice Overs for characters");
     for character in characters {
         let voice_over_map =
             index::character::get_voice_overs(&character, &mut resource_pool).await;
@@ -76,20 +76,20 @@ async fn first_run() {
         data::write_enemy(&enemy);
     }
 
-    println!("{} resource(s) to be downloaded", &resource_pool.len());
+    info!("{} resource(s) to be downloaded", &resource_pool.len());
     let (download_total, downloads) = downloader::download_resources(&resource_pool)
         .await
         .unwrap();
     let download = start_time.elapsed();
     let ops = FormatSizeOptions::default();
     let download_total_size = format_size(download_total, ops);
-    println!(
+    info!(
         "First run took {}, {} downloaded",
         format_duration(download),
         download_total_size
     );
 
-    println!("Everything's ready, starting...")
+    info!("Everything's ready, starting...")
 }
 
 #[tokio::main]
@@ -105,10 +105,10 @@ async fn main() {
     let player = soloud::Soloud::default().unwrap();
     // Tryna decide if we should even have a greeting voice over
     // audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
-    println!("This is a temp line, would be removed in the future");
+    info!("This is a temp line, would be removed in the future");
     audio::play_voice_over(&player, audio::VoiceOverType::Parting);
 
     // FIXME: This shouldnt be here in 1.0.0
-    eprintln!("Press CTRL + C to exit...");
+    info!("Press CTRL + C to exit...");
     loop {}
 }
