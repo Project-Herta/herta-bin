@@ -11,6 +11,7 @@ const STAR_CHAR: &str = "✦";
 pub struct Download {
     dl_type: DownloadType,
     url: String,
+    file: Option<PathBuf>,
 }
 
 #[derive(PartialEq, Clone, Copy)]
@@ -74,7 +75,12 @@ impl Download {
         Self {
             dl_type: download_type,
             url,
+            file: None,
         }
+    }
+
+    fn mark_downloaded(&mut self, file: PathBuf) {
+        self.file = Some(file);
     }
 }
 
