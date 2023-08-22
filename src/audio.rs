@@ -1,3 +1,4 @@
+use log::{error, info};
 use rand::seq::SliceRandom;
 use soloud::{audio, AudioExt, LoadExt, Soloud};
 
@@ -22,14 +23,14 @@ pub fn play_voice_over(player: &Soloud, vo_type: VoiceOverType) {
 
         match audio_chosen.load(&audio_file) {
             Ok(_) => {
-                println!("Playing {}'s voiceline", character);
+                info!("Playing {}'s voiceline", character);
                 player.play(&audio_chosen);
 
                 wait_until_finished(player);
                 break;
             }
             Err(e) => {
-                eprintln!(
+                error!(
                     "An error occurred while trying to play audio {:?}: {}",
                     audio_file.display(),
                     e
