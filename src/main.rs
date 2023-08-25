@@ -77,7 +77,7 @@ async fn first_run() {
     }
 
     info!("{} resource(s) to be downloaded", &resource_pool.len());
-    let (download_total, downloads) = downloader::download_resources(&resource_pool)
+    let download_total = downloader::download_resources(&resource_pool)
         .await
         .unwrap();
     let download = start_time.elapsed();

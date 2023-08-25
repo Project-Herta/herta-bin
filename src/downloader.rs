@@ -5,6 +5,7 @@ use reqwest::{
     Response,
 };
 
+use std::cell::RefCell;
 use std::fs::{create_dir_all, metadata, OpenOptions};
 use std::io::{self, prelude::*};
 use std::path::PathBuf;
@@ -17,6 +18,23 @@ pub trait Downloadable: Clone {
     fn mark_downloaded(&mut self, file: PathBuf);
 }
 
+impl<I> Downloadable for RefCell<I>
+where
+    I: Downloadable,
+{
+    fn url(&self) -> &String {
+        self.url()
+    }
+
+    fn mark_downloaded(&mut self, file: PathBuf) {
+        self.mark_downloaded(file);
+    }
+
+    fn base_dir(&self) -> PathBuf {
+        self.base_dir()
+    }
+}
+
 #[derive(Debug)]
 pub enum DownloadError {
     NetworkError(reqwest::Error),
@@ -24,7 +42,7 @@ pub enum DownloadError {
     NothingToDownload,
 }
 
-pub async fn download_resources<'a, D>(urls: &Vec<D>) -> Result<u64, DownloadError>
+pub async fn download_resources<'a, D>(urls: &Vec<RefCell<D>>) -> Result<u64, DownloadError>
 where
     D: Downloadable,
 {
@@ -32,7 +50,7 @@ where
         return Err(DownloadError::NothingToDownload);
     }
 
-    let mut resps = get(urls).await?;
+    let resps = get(urls).await?;
     let mut downloaded_total = 0;
 
     for (download, resp) in resps {
@@ -74,7 +92,7 @@ where
         }
 
         let filename = filename.canonicalize().unwrap();
-        (*download).mark_downloaded(filename);
+        download.borrow_mut().mark_downloaded(filename);
     }
 
     Ok(downloaded_total)
