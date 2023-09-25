@@ -26,7 +26,7 @@ pub enum DownloadType {
 
 impl AsRef<Path> for DownloadType {
     fn as_ref(&self) -> &Path {
-        &Path::new(match self {
+        Path::new(match self {
             DownloadType::CharacterPortrait => "images/characters/portrait",
             DownloadType::CharacterSplash => "images/characters/splash",
             DownloadType::CharacterRarity => "images/characters/rarity",
@@ -37,9 +37,9 @@ impl AsRef<Path> for DownloadType {
     }
 }
 
-impl Into<PathBuf> for DownloadType {
-    fn into(self) -> PathBuf {
-        PathBuf::from(match self {
+impl From<DownloadType> for PathBuf {
+    fn from(val: DownloadType) -> Self {
+        PathBuf::from(match val {
             DownloadType::CharacterPortrait => "images/characters/portrait",
             DownloadType::CharacterSplash => "images/characters/splash",
             DownloadType::CharacterRarity => "images/characters/rarity",
@@ -225,16 +225,16 @@ pub enum CharacterCType {
     Imaginary,
 }
 
-impl Into<u8> for CharacterCType {
-    fn into(self) -> u8 {
-        match self {
-            Self::Fire => 0,
-            Self::Ice => 1,
-            Self::Lightning => 2,
-            Self::Wind => 3,
-            Self::Physical => 0,
-            Self::Quantum => 4,
-            Self::Imaginary => 5,
+impl From<CharacterCType> for u8 {
+    fn from(val: CharacterCType) -> Self {
+        match val {
+            CharacterCType::Fire => 0,
+            CharacterCType::Ice => 1,
+            CharacterCType::Lightning => 2,
+            CharacterCType::Wind => 3,
+            CharacterCType::Physical => 0,
+            CharacterCType::Quantum => 4,
+            CharacterCType::Imaginary => 5,
         }
     }
 }
@@ -265,16 +265,16 @@ pub enum CharacterPath {
     Preservation,
 }
 
-impl Into<u8> for CharacterPath {
-    fn into(self) -> u8 {
-        match self {
-            Self::Destruction => 0,
-            Self::Harmony => 1,
-            Self::Abundance => 2,
-            Self::Erudition => 3,
-            Self::Hunt => 4,
-            Self::Nihility => 5,
-            Self::Preservation => 6,
+impl From<CharacterPath> for u8 {
+    fn from(val: CharacterPath) -> Self {
+        match val {
+            CharacterPath::Destruction => 0,
+            CharacterPath::Harmony => 1,
+            CharacterPath::Abundance => 2,
+            CharacterPath::Erudition => 3,
+            CharacterPath::Hunt => 4,
+            CharacterPath::Nihility => 5,
+            CharacterPath::Preservation => 6,
         }
     }
 }

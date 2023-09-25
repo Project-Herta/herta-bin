@@ -103,12 +103,14 @@ async fn main() {
     }
 
     let player = soloud::Soloud::default().unwrap();
-    // Tryna decide if we should even have a greeting voice over
+    // Trying to decide if we should even have a greeting voice over
     // audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
     info!("This is a temp line, would be removed in the future");
     audio::play_voice_over(&player, audio::VoiceOverType::Parting);
 
-    // FIXME: This shouldnt be here in 1.0.0
+    // FIXME: This should not be here in 1.0.0
     info!("Press CTRL + C to exit...");
-    loop {}
+    loop {
+        std::thread::yield_now()
+    }
 }

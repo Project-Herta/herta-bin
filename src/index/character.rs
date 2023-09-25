@@ -1,10 +1,10 @@
-use std::collections::HashMap;
+use std::{cell::RefCell, collections::HashMap};
 
 use crate::types::*;
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
-pub async fn index_characters(resources: &mut Vec<Download>) -> Vec<Character> {
+pub async fn index_characters(resources: &mut Vec<RefCell<Download>>) -> Vec<Character> {
     let resp = reqwest::get(CHARACTER_INDEX)
         .await
         .unwrap()
@@ -28,23 +28,23 @@ pub async fn index_characters(resources: &mut Vec<Download>) -> Vec<Character> {
 
         character.portrait = Some(portrait);
         character.splash = Some(splash);
-        resources.push(Download::new(
+        resources.push(RefCell::new(Download::new(
             DownloadType::CharacterPortrait,
             character.portrait.clone().unwrap(),
-        ));
-        resources.push(Download::new(
+        )));
+        resources.push(RefCell::new(Download::new(
             DownloadType::CharacterSplash,
             character.splash.clone().unwrap(),
-        ));
+        )));
 
         characters.push(character);
 
-        let rarity = Download::new(DownloadType::CharacterRarity, rarity);
+        let rarity = RefCell::new(Download::new(DownloadType::CharacterRarity, rarity));
         if !resources.contains(&rarity) {
             resources.push(rarity);
         }
 
-        let ctype = Download::new(DownloadType::CharacterCombatType, ctype);
+        let ctype = RefCell::new(Download::new(DownloadType::CharacterCombatType, ctype));
         if !resources.contains(&ctype) {
             resources.push(ctype);
         }
@@ -55,16 +55,19 @@ pub async fn index_characters(resources: &mut Vec<Download>) -> Vec<Character> {
 
 pub async fn get_voice_overs(
     character: &Character,
-    resources: &mut Vec<Download>,
+    resources: &mut Vec<RefCell<Download>>,
 ) -> HashMap<String, String> {
     let url = format!("{}/Voice-Overs/{}", character.link(), "Japanese");
     let mut res = HashMap::with_capacity(12);
     let resp = reqwest::get(url).await.unwrap().text().await.unwrap();
     let raw = herta::extractor::get_voice_overs(resp);
 
-    resources.extend(raw.clone().iter().filter_map(|(vo_type, src)| {
+    resources.extend(raw.iter().filter_map(|(vo_type, src)| {
         if filter_voice_overs(vo_type) {
-            Some(Download::new(DownloadType::VoiceOver, src.to_owned()))
+            Some(RefCell::new(Download::new(
+                DownloadType::VoiceOver,
+                src.to_owned(),
+            )))
         } else {
             None
         }

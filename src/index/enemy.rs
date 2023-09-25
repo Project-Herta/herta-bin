@@ -1,8 +1,10 @@
+use std::cell::RefCell;
+
 use crate::types::*;
 
 const ENEMY_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Category:Enemies";
 
-pub async fn index_enemies(resources: &mut Vec<Download>) -> Vec<Enemy> {
+pub async fn index_enemies(resources: &mut Vec<RefCell<Download>>) -> Vec<Enemy> {
     let resp = reqwest::get(ENEMY_INDEX)
         .await
         .unwrap()
@@ -25,10 +27,10 @@ pub async fn index_enemies(resources: &mut Vec<Download>) -> Vec<Enemy> {
         enemy.set_dres_values(herta::extractor::get_enemy_debuff_resistances(html.clone()));
         enemy.set_res_values(herta::extractor::get_enemy_resistances(html));
 
-        resources.push(Download::new(
+        resources.push(RefCell::new(Download::new(
             DownloadType::EnemyImage,
             enemy.portrait_url.clone(),
-        ));
+        )));
         enemies.push(enemy);
     }
 

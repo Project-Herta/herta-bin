@@ -5,10 +5,10 @@ use reqwest::{
     Response,
 };
 
-use std::cell::RefCell;
 use std::fs::{create_dir_all, metadata, OpenOptions};
 use std::io::{self, prelude::*};
 use std::path::PathBuf;
+use std::{cell::RefCell, path::Path};
 
 pub trait Downloadable: Clone {
     fn url(&self) -> &String;
@@ -18,6 +18,10 @@ pub trait Downloadable: Clone {
     fn mark_downloaded(&mut self, file: PathBuf);
 }
 
+// This is because we are interfacing any
+// RefCell<dyn Downloadable> in order to avoid
+// massive code overhauls
+#[allow(unconditional_recursion, clippy::only_used_in_recursion)]
 impl<I> Downloadable for RefCell<I>
 where
     I: Downloadable,
@@ -70,7 +74,7 @@ where
 
         let filename = get_filename(&root_dir, headers);
 
-        if let Ok(_) = metadata(&filename) {
+        if metadata(&filename).is_ok() {
             // We skipping that download
             continue;
         }
@@ -79,7 +83,7 @@ where
             .create_new(true)
             .write(true)
             .open(&filename)
-            .map_err(|e| DownloadError::CreateFileError(e))?;
+            .map_err(DownloadError::CreateFileError)?;
 
         info!("Saving to {}...", &filename.display());
         while let Some(chunk) = stream.next().await {
@@ -87,7 +91,7 @@ where
             downloaded_total += bytes.len() as u64;
 
             savefile
-                .write(&bytes)
+                .write_all(&bytes)
                 .expect("expected for chunk to be written");
         }
 
@@ -111,21 +115,21 @@ where
     for (resp, download) in resps {
         res.push((
             download.clone(),
-            resp.await.map_err(|e| DownloadError::NetworkError(e))?,
+            resp.await.map_err(DownloadError::NetworkError)?,
         ));
     }
 
     Ok(res)
 }
 
-fn get_filename(root_dir: &PathBuf, headers: HeaderMap) -> PathBuf {
+fn get_filename(root_dir: &Path, headers: HeaderMap) -> PathBuf {
     let raw = headers
         .get(header::CONTENT_DISPOSITION)
         .unwrap()
         .to_str()
         .unwrap();
 
-    let span = raw.match_indices("\"").map(|(i, _s)| i).collect::<Vec<_>>();
+    let span = raw.match_indices('\"').map(|(i, _s)| i).collect::<Vec<_>>();
     let start = span[0] + 1;
     let end = span[1];
     let disposition = &raw[start..end];
@@ -149,5 +153,5 @@ fn urldecode(raw: String) -> String {
         );
     }
 
-    return res;
+    res
 }
