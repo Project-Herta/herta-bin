@@ -24,17 +24,15 @@ pub async fn index_characters(resources: &mut Vec<RefCell<Download>>) -> Vec<Cha
             .unwrap();
 
         let (portrait, splash) = herta::extractor::get_character_art(html).unwrap();
-        let mut character = Character::from(character);
+        let character = Character::from(character);
 
-        character.portrait = Some(portrait);
-        character.splash = Some(splash);
         resources.push(RefCell::new(Download::new(
             DownloadType::CharacterPortrait,
-            character.portrait.clone().unwrap(),
+            portrait,
         )));
         resources.push(RefCell::new(Download::new(
             DownloadType::CharacterSplash,
-            character.splash.clone().unwrap(),
+            splash,
         )));
 
         characters.push(character);

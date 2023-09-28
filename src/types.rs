@@ -87,7 +87,7 @@ pub struct Enemy {
 
     resources: Vec<Download>,
 
-    #[serde(skip_serializing_if = "skip")]
+    #[serde(skip)]
     pub portrait_url: String,
 }
 
@@ -141,15 +141,11 @@ pub struct Character {
     combat_type: CharacterCType,
     resources: Vec<Download>,
 
-    #[serde(skip_serializing_if = "skip")]
-    pub splash: Option<String>,
+    #[serde(skip)]
+    pub splash: Option<PathBuf>,
 
-    #[serde(skip_serializing_if = "skip")]
-    pub portrait: Option<String>,
-}
-
-fn skip<A: Any>(_: &A) -> bool {
-    true
+    #[serde(skip)]
+    pub portrait: Option<PathBuf>,
 }
 
 impl Character {
@@ -165,7 +161,13 @@ impl Character {
         if !resource.is_downloaded() {
             Err(())
         } else {
-            self.resources.push(resource);
+            match resource.dl_type {
+                DownloadType::CharacterPortrait => self.portrait = resource.file,
+                DownloadType::CharacterSplash => self.splash = resource.file,
+                _ => {
+                    self.resources.push(resource);
+                }
+            }
 
             Ok(())
         }
