@@ -78,83 +78,114 @@ impl Download {
     }
 }
 
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// pub enum CharacterCType {
-//     Fire,
-//     Ice,
-//     Lightning,
-//     Wind,
-//     Physical,
-//     Quantum,
-//     Imaginary,
-// }
+pub struct Character {
+    name: String,
+    link: String,
+    rarity: String,
+    ctype: CharacterCType,
+    path: CharacterPath,
 
-// impl From<CharacterCType> for u8 {
-//     fn from(val: CharacterCType) -> Self {
-//         match val {
-//             CharacterCType::Fire => 0,
-//             CharacterCType::Ice => 1,
-//             CharacterCType::Lightning => 2,
-//             CharacterCType::Wind => 3,
-//             CharacterCType::Physical => 0,
-//             CharacterCType::Quantum => 4,
-//             CharacterCType::Imaginary => 5,
-//         }
-//     }
-// }
-// impl TryFrom<String> for CharacterCType {
-//     type Error = String;
-//     fn try_from(value: String) -> Result<Self, Self::Error> {
-//         match value.as_str() {
-//             "Fire" => Ok(Self::Fire),
-//             "Ice" => Ok(Self::Ice),
-//             "Lightning" => Ok(Self::Lightning),
-//             "Wind" => Ok(Self::Wind),
-//             "Physical" => Ok(Self::Physical),
-//             "Quantum" => Ok(Self::Quantum),
-//             "Imaginary" => Ok(Self::Imaginary),
-//             other => Err(format!("No such type: {}", other)),
-//         }
-//     }
-// }
+    resources: Vec<Download>,
+}
+impl Character {
+    pub fn add_resource(&mut self, resource: Download) {
+        self.resources.push(resource)
+    }
 
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// pub enum CharacterPath {
-//     Destruction,
-//     Harmony,
-//     Abundance,
-//     Erudition,
-//     Hunt,
-//     Nihility,
-//     Preservation,
-// }
+    pub fn get_splash(&self) -> Option<PathBuf> {
+        self.resources
+            .iter()
+            .find(|d| d.dl_type == DownloadType::CharacterSplash)?
+            .clone()
+            .file
+    }
 
-// impl From<CharacterPath> for u8 {
-//     fn from(val: CharacterPath) -> Self {
-//         match val {
-//             CharacterPath::Destruction => 0,
-//             CharacterPath::Harmony => 1,
-//             CharacterPath::Abundance => 2,
-//             CharacterPath::Erudition => 3,
-//             CharacterPath::Hunt => 4,
-//             CharacterPath::Nihility => 5,
-//             CharacterPath::Preservation => 6,
-//         }
-//     }
-// }
+    pub fn get_portrait(&self) -> Option<PathBuf> {
+        self.resources
+            .iter()
+            .find(|d| d.dl_type == DownloadType::CharacterPortrait)?
+            .clone()
+            .file
+    }
+}
 
-// impl TryFrom<String> for CharacterPath {
-//     type Error = String;
-//     fn try_from(value: String) -> Result<Self, Self::Error> {
-//         match value.as_str() {
-//             "The Destruction" => Ok(Self::Destruction),
-//             "The Harmony" => Ok(Self::Harmony),
-//             "The Abundance" => Ok(Self::Abundance),
-//             "The Erudition" => Ok(Self::Erudition),
-//             "The Hunt" => Ok(Self::Hunt),
-//             "The Nihility" => Ok(Self::Nihility),
-//             "The Preservation" => Ok(Self::Preservation),
-//             other => Err(format!("No such path: {}", other)),
-//         }
-//     }
-// }
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum CharacterCType {
+    Fire,
+    Ice,
+    Lightning,
+    Wind,
+    Physical,
+    Quantum,
+    Imaginary,
+}
+
+impl From<CharacterCType> for u8 {
+    fn from(val: CharacterCType) -> Self {
+        match val {
+            CharacterCType::Fire => 0,
+            CharacterCType::Ice => 1,
+            CharacterCType::Lightning => 2,
+            CharacterCType::Wind => 3,
+            CharacterCType::Physical => 0,
+            CharacterCType::Quantum => 4,
+            CharacterCType::Imaginary => 5,
+        }
+    }
+}
+impl TryFrom<String> for CharacterCType {
+    type Error = String;
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match value.as_str() {
+            "Fire" => Ok(Self::Fire),
+            "Ice" => Ok(Self::Ice),
+            "Lightning" => Ok(Self::Lightning),
+            "Wind" => Ok(Self::Wind),
+            "Physical" => Ok(Self::Physical),
+            "Quantum" => Ok(Self::Quantum),
+            "Imaginary" => Ok(Self::Imaginary),
+            other => Err(format!("No such type: {}", other)),
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum CharacterPath {
+    Destruction,
+    Harmony,
+    Abundance,
+    Erudition,
+    Hunt,
+    Nihility,
+    Preservation,
+}
+
+impl From<CharacterPath> for u8 {
+    fn from(val: CharacterPath) -> Self {
+        match val {
+            CharacterPath::Destruction => 0,
+            CharacterPath::Harmony => 1,
+            CharacterPath::Abundance => 2,
+            CharacterPath::Erudition => 3,
+            CharacterPath::Hunt => 4,
+            CharacterPath::Nihility => 5,
+            CharacterPath::Preservation => 6,
+        }
+    }
+}
+
+impl TryFrom<String> for CharacterPath {
+    type Error = String;
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        match value.as_str() {
+            "The Destruction" => Ok(Self::Destruction),
+            "The Harmony" => Ok(Self::Harmony),
+            "The Abundance" => Ok(Self::Abundance),
+            "The Erudition" => Ok(Self::Erudition),
+            "The Hunt" => Ok(Self::Hunt),
+            "The Nihility" => Ok(Self::Nihility),
+            "The Preservation" => Ok(Self::Preservation),
+            other => Err(format!("No such path: {}", other)),
+        }
+    }
+}
