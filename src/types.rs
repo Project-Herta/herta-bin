@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
-use std::any::Any;
-use std::fmt::Display;
 use std::path::{Path, PathBuf};
+use std::sync::Arc;
+use std::sync::RwLock;
 
 use crate::downloader::Downloadable;
 
@@ -9,9 +9,9 @@ const STAR_CHAR: &str = "✦";
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Download {
-    dl_type: DownloadType,
+    pub dl_type: DownloadType,
     url: String,
-    file: Option<PathBuf>,
+    pub file: Option<PathBuf>,
 }
 
 #[derive(Debug, PartialEq, Clone, Copy, Serialize, Deserialize)]
@@ -65,12 +65,12 @@ impl Downloadable for Download {
 }
 
 impl Download {
-    pub fn new(download_type: DownloadType, url: String) -> Self {
-        Self {
+    pub fn new(download_type: DownloadType, url: String) -> Arc<RwLock<Download>> {
+        Arc::new(RwLock::new(Self {
             dl_type: download_type,
             url,
             file: None,
-        }
+        }))
     }
 
     fn is_downloaded(&self) -> bool {
@@ -86,13 +86,11 @@ pub struct Character {
     ctype: CharacterCType,
     path: CharacterPath,
 
-    resources: Vec<Download>,
+    resources: Vec<Arc<RwLock<Download>>>,
 }
 
 impl From<herta::extractor::Character> for Character {
     fn from(value: herta::extractor::Character) -> Self {
-        dbg!(&value.rarity);
-
         Self {
             name: value.name,
             link: value.link,
@@ -106,24 +104,8 @@ impl From<herta::extractor::Character> for Character {
 }
 
 impl Character {
-    pub fn add_resource(&mut self, resource: Download) {
+    pub fn add_resource(&mut self, resource: Arc<RwLock<Download>>) {
         self.resources.push(resource)
-    }
-
-    pub fn get_splash(&self) -> Option<PathBuf> {
-        self.resources
-            .iter()
-            .find(|d| d.dl_type == DownloadType::CharacterSplash)?
-            .clone()
-            .file
-    }
-
-    pub fn get_portrait(&self) -> Option<PathBuf> {
-        self.resources
-            .iter()
-            .find(|d| d.dl_type == DownloadType::CharacterPortrait)?
-            .clone()
-            .file
     }
 }
 

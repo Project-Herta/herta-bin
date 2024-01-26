@@ -110,6 +110,7 @@ async fn main() {
     let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
 
     index::character::index_characters(&mut resources, &mut out).await;
+    dbg!(resources);
 
     // if !root_dir.exists() {
     //     first_run().await
