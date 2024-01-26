@@ -6,7 +6,7 @@
 use humansize::{format_size, FormatSizeOptions};
 use humantime::format_duration;
 use log::info;
-use std::time::Instant;
+use std::{sync::Mutex, time::Instant};
 
 mod audio;
 mod data;
@@ -104,21 +104,26 @@ mod types;
 async fn main() {
     logger::setup();
 
+    let mut resources = Mutex::new(vec![]);
+    let mut out = vec![];
+
     let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
+
+    index::character::index_characters(&mut resources, &mut out).await;
 
     // if !root_dir.exists() {
     //     first_run().await
     // }
 
-    let player = soloud::Soloud::default().unwrap();
-    // Trying to decide if we should even have a greeting voice over
-    // audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
-    info!("This is a temp line, would be removed in the future");
-    audio::play_voice_over(&player, audio::VoiceOverType::Parting);
+    // let player = soloud::Soloud::default().unwrap();
+    // // Trying to decide if we should even have a greeting voice over
+    // // audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
+    // info!("This is a temp line, would be removed in the future");
+    // audio::play_voice_over(&player, audio::VoiceOverType::Parting);
 
-    // FIXME: This should not be here in 1.0.0
-    info!("Press CTRL + C to exit...");
-    loop {
-        std::thread::yield_now()
-    }
+    // // FIXME: This should not be here in 1.0.0
+    // info!("Press CTRL + C to exit...");
+    // loop {
+    //     std::thread::yield_now()
+    // }
 }

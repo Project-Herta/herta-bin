@@ -23,7 +23,7 @@ pub fn setup() {
                 msg,
             ))
         })
-        .level(log::LevelFilter::Info)
+        .level(log::LevelFilter::Debug)
         .level_for("html5ever", log::LevelFilter::Off)
         .level_for("selectors", log::LevelFilter::Off)
         .level_for("reqwest", log::LevelFilter::Off)

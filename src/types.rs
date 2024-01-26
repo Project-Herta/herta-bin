@@ -78,6 +78,7 @@ impl Download {
     }
 }
 
+#[derive(Debug)]
 pub struct Character {
     name: String,
     link: String,
@@ -87,6 +88,23 @@ pub struct Character {
 
     resources: Vec<Download>,
 }
+
+impl From<herta::extractor::Character> for Character {
+    fn from(value: herta::extractor::Character) -> Self {
+        dbg!(&value.rarity);
+
+        Self {
+            name: value.name,
+            link: value.link,
+            rarity: value.rarity.chars().next().unwrap().to_string(),
+            ctype: CharacterCType::try_from(value.ctype).expect("expected ctype to work"),
+            path: CharacterPath::try_from(value.path).expect("expected cpath to work"),
+
+            resources: vec![],
+        }
+    }
+}
+
 impl Character {
     pub fn add_resource(&mut self, resource: Download) {
         self.resources.push(resource)
@@ -133,6 +151,7 @@ impl From<CharacterCType> for u8 {
         }
     }
 }
+
 impl TryFrom<String> for CharacterCType {
     type Error = String;
     fn try_from(value: String) -> Result<Self, Self::Error> {
@@ -178,13 +197,13 @@ impl TryFrom<String> for CharacterPath {
     type Error = String;
     fn try_from(value: String) -> Result<Self, Self::Error> {
         match value.as_str() {
-            "The Destruction" => Ok(Self::Destruction),
-            "The Harmony" => Ok(Self::Harmony),
-            "The Abundance" => Ok(Self::Abundance),
-            "The Erudition" => Ok(Self::Erudition),
+            "Destruction" => Ok(Self::Destruction),
+            "Harmony" => Ok(Self::Harmony),
+            "Abundance" => Ok(Self::Abundance),
+            "Erudition" => Ok(Self::Erudition),
             "The Hunt" => Ok(Self::Hunt),
-            "The Nihility" => Ok(Self::Nihility),
-            "The Preservation" => Ok(Self::Preservation),
+            "Nihility" => Ok(Self::Nihility),
+            "Preservation" => Ok(Self::Preservation),
             other => Err(format!("No such path: {}", other)),
         }
     }
