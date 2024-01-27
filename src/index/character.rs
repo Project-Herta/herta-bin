@@ -21,6 +21,7 @@ pub async fn index_characters(
 
     for character in herta::extractor::index_characters(resp) {
         debug!("Processing data for character {}", &character.name);
+
         let pool = resource_pool.get_mut().unwrap();
         let mut character_resources = vec![];
 
@@ -44,7 +45,7 @@ pub async fn index_characters(
         }
 
         if let Some(splash) = splash {
-            character_resources.push(Download::new(DownloadType::CharacterPortrait, splash));
+            character_resources.push(Download::new(DownloadType::CharacterSplash, splash));
         }
 
         character_resources.iter().for_each(|resource| {

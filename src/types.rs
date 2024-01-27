@@ -214,3 +214,9 @@ impl From<herta::extractor::Enemy> for Enemy {
         }
     }
 }
+
+impl Enemy {
+    pub fn add_resource(&mut self, resource: Arc<RwLock<Download>>) {
+        self.resources.push(resource)
+    }
+}

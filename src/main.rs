@@ -105,11 +105,13 @@ async fn main() {
     logger::setup();
 
     let mut resources = Mutex::new(vec![]);
-    let mut out = vec![];
+    let mut enemies = vec![];
+    let mut characters = vec![];
 
     let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
 
-    index::enemy::index_enemies(&mut resources, &mut out).await;
+    index::enemy::index_enemies(&mut resources, &mut enemies).await;
+    index::character::index_characters(&mut resources, &mut characters).await;
     dbg!(resources);
 
     // if !root_dir.exists() {

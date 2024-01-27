@@ -22,6 +22,10 @@ pub async fn index_enemies(
 
     for enemy in herta::extractor::index_enemies(resp) {
         debug!("Processing data for enemy: {}", &enemy.name);
+
+        let pool = resource_pool.get_mut().unwrap();
+        let mut enemy_resources = vec![];
+
         let html = reqwest::get(&enemy.link)
             .await
             .unwrap()
@@ -30,10 +34,19 @@ pub async fn index_enemies(
             .unwrap();
 
         let mut enemy = Enemy::from(enemy);
-        let portrait = herta::extractor::get_enemy_portrait(html.clone());
+        let portrait = herta::extractor::get_enemy_portrait(&html);
 
-        enemy.resistances = herta::extractor::get_enemy_resistances(html.clone());
-        enemy.debuff_resistances = herta::extractor::get_enemy_debuff_resistances(html);
-        dbg!(enemy);
+        if let Some(portrait) = portrait {
+            enemy_resources.push(Download::new(DownloadType::EnemyImage, portrait));
+        }
+
+        enemy.resistances = herta::extractor::get_enemy_resistances(&html);
+        enemy.debuff_resistances = herta::extractor::get_enemy_debuff_resistances(&html);
+
+        enemy_resources.iter().for_each(|resource| {
+            enemy.add_resource(resource.clone());
+            pool.push(resource.clone());
+        });
+        enemies.push(enemy);
     }
 }
