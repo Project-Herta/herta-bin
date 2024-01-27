@@ -441,9 +441,9 @@ dependencies = [
 
 [[package]]
 name = "herta-lib"
-version = "1.0.0"
+version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a1f0e02ab58eac0d3aab1892ac15a7326bfd0c7f2a9a089acad3df2f8a68852f"
+checksum = "7f32ea5db220dfe5bbb035d589123500001f0aae4ce621a33780e70b13317067"
 dependencies = [
  "platform-dirs",
  "scraper",

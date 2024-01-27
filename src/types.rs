@@ -10,6 +10,8 @@ const STAR_CHAR: &str = "✦";
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Download {
     pub dl_type: DownloadType,
+    // FIXME: Might use Cow<'_, str> here to avoid having to use
+    // Arc<RwLock<Download>>
     url: String,
     pub file: Option<PathBuf>,
 }
@@ -187,6 +189,28 @@ impl TryFrom<String> for CharacterPath {
             "Nihility" => Ok(Self::Nihility),
             "Preservation" => Ok(Self::Preservation),
             other => Err(format!("No such path: {}", other)),
+        }
+    }
+}
+
+#[derive(Debug)]
+pub struct Enemy {
+    pub link: String,
+    pub name: String,
+    pub resistances: Vec<u8>,
+    pub debuff_resistances: Vec<u8>,
+
+    resources: Vec<Arc<RwLock<Download>>>,
+}
+
+impl From<herta::extractor::Enemy> for Enemy {
+    fn from(value: herta::extractor::Enemy) -> Self {
+        Self {
+            name: value.name,
+            link: value.link,
+            resistances: vec![],
+            debuff_resistances: vec![],
+            resources: vec![],
         }
     }
 }

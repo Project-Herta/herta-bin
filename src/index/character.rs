@@ -20,7 +20,7 @@ pub async fn index_characters(
         .unwrap();
 
     for character in herta::extractor::index_characters(resp) {
-        debug!("Processing data for {}", &character.name);
+        debug!("Processing data for character {}", &character.name);
         let pool = resource_pool.get_mut().unwrap();
         let mut character_resources = vec![];
 
