@@ -29,7 +29,11 @@ pub async fn index_enemies(
             .await
             .unwrap();
 
-        let enemy = Enemy::from(enemy);
+        let mut enemy = Enemy::from(enemy);
+        let portrait = herta::extractor::get_enemy_portrait(html.clone());
+
+        enemy.resistances = herta::extractor::get_enemy_resistances(html.clone());
+        enemy.debuff_resistances = herta::extractor::get_enemy_debuff_resistances(html);
         dbg!(enemy);
     }
 }
