@@ -40,10 +40,10 @@ pub fn play_voice_over(player: &Soloud, vo_type: VoiceOverType) {
     }
 }
 
-fn get_audio_file(character: &String, vo_type: &VoiceOverType) -> PathBuf {
+fn get_audio_file(character: &str, vo_type: &VoiceOverType) -> PathBuf {
     PathBuf::from(format!(
         "VO_JA_Archive_{}_{}.ogg",
-        character.replace(" ", "_"),
+        character.replace(' ', "_"),
         match vo_type {
             VoiceOverType::Parting => 3,
         }

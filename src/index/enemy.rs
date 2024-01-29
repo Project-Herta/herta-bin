@@ -1,8 +1,18 @@
+use std::sync::Arc;
+use std::sync::Mutex;
+use std::sync::RwLock;
+
+use log::debug;
+
+use crate::types::Enemy;
 use crate::types::*;
 
 const ENEMY_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Category:Enemies";
 
-pub async fn index_enemies(resources: &mut Vec<Download>) -> Vec<Enemy> {
+pub async fn index_enemies(
+    resource_pool: &mut Mutex<Vec<Arc<RwLock<Download>>>>,
+    enemies: &mut Vec<Enemy>,
+) {
     let resp = reqwest::get(ENEMY_INDEX)
         .await
         .unwrap()
@@ -10,27 +20,33 @@ pub async fn index_enemies(resources: &mut Vec<Download>) -> Vec<Enemy> {
         .await
         .unwrap();
 
-    let mut enemies: Vec<Enemy> = vec![];
-
     for enemy in herta::extractor::index_enemies(resp) {
-        let mut enemy: Enemy = enemy.into();
-        let html = reqwest::get(enemy.link())
+        debug!("Processing data for enemy: {}", &enemy.name);
+
+        let pool = resource_pool.get_mut().unwrap();
+        let mut enemy_resources = vec![];
+
+        let html = reqwest::get(&enemy.link)
             .await
             .unwrap()
             .text()
             .await
             .unwrap();
 
-        enemy.portrait_url = herta::extractor::get_enemy_portrait(html.clone());
-        enemy.set_dres_values(herta::extractor::get_enemy_debuff_resistances(html.clone()));
-        enemy.set_res_values(herta::extractor::get_enemy_resistances(html));
+        let mut enemy = Enemy::from(enemy);
+        let portrait = herta::extractor::get_enemy_portrait(&html);
 
-        resources.push(Download::new(
-            DownloadType::EnemyImage,
-            enemy.portrait_url.clone(),
-        ));
+        if let Some(portrait) = portrait {
+            enemy_resources.push(Download::new(DownloadType::EnemyImage, portrait));
+        }
+
+        enemy.resistances = herta::extractor::get_enemy_resistances(&html);
+        enemy.debuff_resistances = herta::extractor::get_enemy_debuff_resistances(&html);
+
+        enemy_resources.iter().for_each(|resource| {
+            enemy.add_resource(resource.clone());
+            pool.push(resource.clone());
+        });
         enemies.push(enemy);
     }
-
-    enemies
 }
