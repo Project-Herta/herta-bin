@@ -8,6 +8,7 @@ use reqwest::{
 use std::fs::{create_dir_all, metadata, OpenOptions};
 use std::io::{self, prelude::*};
 use std::path::PathBuf;
+use std::{cell::RefCell, path::Path};
 
 pub trait Downloadable: Clone {
     fn url(&self) -> &String;
@@ -17,6 +18,27 @@ pub trait Downloadable: Clone {
     fn mark_downloaded(&mut self, file: PathBuf);
 }
 
+// This is because we are interfacing any
+// RefCell<dyn Downloadable> in order to avoid
+// massive code overhauls
+#[allow(unconditional_recursion, clippy::only_used_in_recursion)]
+impl<I> Downloadable for RefCell<I>
+where
+    I: Downloadable,
+{
+    fn url(&self) -> &String {
+        self.url()
+    }
+
+    fn mark_downloaded(&mut self, file: PathBuf) {
+        self.mark_downloaded(file);
+    }
+
+    fn base_dir(&self) -> PathBuf {
+        self.base_dir()
+    }
+}
+
 #[derive(Debug)]
 pub enum DownloadError {
     NetworkError(reqwest::Error),
@@ -24,7 +46,7 @@ pub enum DownloadError {
     NothingToDownload,
 }
 
-pub async fn download_resources<'a, D>(urls: &Vec<D>) -> Result<u64, DownloadError>
+pub async fn download_resources<'a, D>(urls: &Vec<RefCell<D>>) -> Result<u64, DownloadError>
 where
     D: Downloadable,
 {
@@ -32,7 +54,7 @@ where
         return Err(DownloadError::NothingToDownload);
     }
 
-    let mut resps = get(urls).await?;
+    let resps = get(urls).await?;
     let mut downloaded_total = 0;
 
     for (download, resp) in resps {
@@ -52,7 +74,7 @@ where
 
         let filename = get_filename(&root_dir, headers);
 
-        if let Ok(_) = metadata(&filename) {
+        if metadata(&filename).is_ok() {
             // We skipping that download
             continue;
         }
@@ -61,7 +83,7 @@ where
             .create_new(true)
             .write(true)
             .open(&filename)
-            .map_err(|e| DownloadError::CreateFileError(e))?;
+            .map_err(DownloadError::CreateFileError)?;
 
         info!("Saving to {}...", &filename.display());
         while let Some(chunk) = stream.next().await {
@@ -69,12 +91,12 @@ where
             downloaded_total += bytes.len() as u64;
 
             savefile
-                .write(&bytes)
+                .write_all(&bytes)
                 .expect("expected for chunk to be written");
         }
 
         let filename = filename.canonicalize().unwrap();
-        (*download).mark_downloaded(filename);
+        download.borrow_mut().mark_downloaded(filename);
     }
 
     Ok(downloaded_total)
@@ -93,21 +115,21 @@ where
     for (resp, download) in resps {
         res.push((
             download.clone(),
-            resp.await.map_err(|e| DownloadError::NetworkError(e))?,
+            resp.await.map_err(DownloadError::NetworkError)?,
         ));
     }
 
     Ok(res)
 }
 
-fn get_filename(root_dir: &PathBuf, headers: HeaderMap) -> PathBuf {
+fn get_filename(root_dir: &Path, headers: HeaderMap) -> PathBuf {
     let raw = headers
         .get(header::CONTENT_DISPOSITION)
         .unwrap()
         .to_str()
         .unwrap();
 
-    let span = raw.match_indices("\"").map(|(i, _s)| i).collect::<Vec<_>>();
+    let span = raw.match_indices('\"').map(|(i, _s)| i).collect::<Vec<_>>();
     let start = span[0] + 1;
     let end = span[1];
     let disposition = &raw[start..end];
@@ -131,5 +153,5 @@ fn urldecode(raw: String) -> String {
         );
     }
 
-    return res;
+    res
 }
