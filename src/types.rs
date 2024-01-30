@@ -82,7 +82,7 @@ impl Download {
 
 #[derive(Debug)]
 pub struct Character {
-    name: String,
+    pub name: String,
     link: String,
     rarity: String,
     ctype: CharacterCType,

@@ -20,7 +20,7 @@ pub async fn index_characters(
         .unwrap();
 
     for character in herta::extractor::index_characters(resp) {
-        debug!("Processing data for character {}", &character.name);
+        info!("Processing data for character {}", &character.name);
 
         let pool = resource_pool.get_mut().unwrap();
         let mut character_resources = vec![];
@@ -34,6 +34,14 @@ pub async fn index_characters(
             .await
             .unwrap();
 
+        let voice_html = reqwest::get(format!("{}/Voice-Overs/Japanese", character.link))
+            .await
+            .unwrap()
+            .text()
+            .await
+            .unwrap();
+
+        let voice_overs = herta::extractor::get_voice_overs(voice_html);
         let (portrait, splash) = herta::extractor::get_character_art(media_html).unzip();
         let mut character = Character::from(character);
 
@@ -46,6 +54,14 @@ pub async fn index_characters(
 
         if let Some(splash) = splash {
             character_resources.push(Download::new(DownloadType::CharacterSplash, splash));
+        }
+
+        for (voice_type, voice_url) in voice_overs {
+            debug!(
+                "Registered {} voice line for {}",
+                voice_type, &character.name
+            );
+            character_resources.push(Download::new(DownloadType::VoiceOver, voice_url));
         }
 
         character_resources.iter().for_each(|resource| {

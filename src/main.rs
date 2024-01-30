@@ -6,7 +6,7 @@
 use humansize::{format_size, FormatSizeOptions};
 use humantime::format_duration;
 use log::info;
-use std::{sync::Mutex, time::Instant};
+use std::{borrow::Borrow, sync::Mutex, time::Instant};
 
 mod audio;
 mod data;
@@ -15,108 +15,80 @@ mod index;
 mod logger;
 mod types;
 
-// async fn first_run() {
-//     // TODO: Replace with INFO logs
-//     info!("========================================================");
-//     info!("First Run!");
-//     info!("Resources will be indexed and downloaded for faster");
-//     info!("startup times in the future");
-//     info!("");
-//     info!("This procedure will take a while (including downloads)");
-//     info!("========================================================");
+async fn first_run() {
+    // TODO: Replace with INFO logs
+    info!("========================================================");
+    info!("First Run!");
+    info!("Resources will be indexed and downloaded for faster");
+    info!("startup times in the future");
+    info!("");
+    info!("This procedure will take a while (including downloads)");
+    info!("========================================================");
 
-//     let start_time = Instant::now();
-//     let mut global_resource_pool = vec![];
-//     let enemies = tokio::spawn(async {
-//         let mut resource_pool = vec![];
+    let start_time = Instant::now();
+    let mut global_resource_pool = Mutex::new(vec![]);
+    let mut characters = vec![];
+    let mut enemies = vec![];
 
-//         (
-//             index::enemy::index_enemies(&mut resource_pool).await,
-//             resource_pool,
-//         )
-//     });
+    info!("Waiting for both tasks to finish");
+    index::character::index_characters(&mut global_resource_pool, &mut characters).await;
+    index::enemy::index_enemies(&mut global_resource_pool, &mut enemies).await;
 
-//     let characters = tokio::spawn(async {
-//         let mut resource_pool = vec![];
+    let scraping_elapsed = start_time.elapsed();
+    info!("Took {}", format_duration(scraping_elapsed));
 
-//         (
-//             index::character::index_characters(&mut resource_pool).await,
-//             resource_pool,
-//         )
-//     });
+    info!(
+        "Indexed {} characters, {} enemies",
+        characters.len(),
+        enemies.len()
+    );
 
-//     info!("Waiting for both tasks to finish");
-//     loop {
-//         let enemies_task_is_finished = enemies.is_finished();
-//         let characters_task_is_finished = characters.is_finished();
+    // for character in characters {
+    //     data::write_character(&character);
+    // }
 
-//         if enemies_task_is_finished && characters_task_is_finished {
-//             break;
-//         }
-//     }
-//     let scraping_elapsed = start_time.elapsed();
-//     info!("Took {}", format_duration(scraping_elapsed));
+    // for enemy in enemies {
+    //     data::write_enemy(&enemy);
+    // }
 
-//     let (enemies, enemies_resources) = enemies.await.unwrap();
-//     let (characters, characters_resources) = characters.await.unwrap();
+    info!(
+        "{} resource(s) to be downloaded",
+        &global_resource_pool.lock().unwrap().len()
+    );
+    // let download_total = downloader::download_resources(&global_resource_pool)
+    //     .await
+    //     .unwrap();
+    // let download = start_time.elapsed();
+    // let ops = FormatSizeOptions::default();
+    // let download_total_size = format_size(download_total, ops);
+    // info!(
+    //     "First run took {}, {} downloaded",
+    //     format_duration(download),
+    //     download_total_size
+    // );
 
-//     global_resource_pool.extend(enemies_resources);
-//     global_resource_pool.extend(characters_resources);
-
-//     info!(
-//         "Indexed {} characters, {} enemies",
-//         characters.len(),
-//         enemies.len()
-//     );
-
-//     info!("Fetching Voice Overs for characters");
-//     for character in characters {
-//         let voice_over_map =
-//             index::character::get_voice_overs(&character, &mut global_resource_pool).await;
-
-//         data::write_character(&character);
-//     }
-
-//     for enemy in enemies {
-//         data::write_enemy(&enemy);
-//     }
-
-//     info!(
-//         "{} resource(s) to be downloaded",
-//         &global_resource_pool.len()
-//     );
-//     let download_total = downloader::download_resources(&global_resource_pool)
-//         .await
-//         .unwrap();
-//     let download = start_time.elapsed();
-//     let ops = FormatSizeOptions::default();
-//     let download_total_size = format_size(download_total, ops);
-//     info!(
-//         "First run took {}, {} downloaded",
-//         format_duration(download),
-//         download_total_size
-//     );
-
-//     info!("Everything's ready, starting...")
-// }
+    info!("Everything's ready, starting...")
+}
 
 #[tokio::main]
 async fn main() {
     logger::setup();
-
-    let mut resources = Mutex::new(vec![]);
-    let mut enemies = vec![];
-    let mut characters = vec![];
-
     let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
 
-    index::enemy::index_enemies(&mut resources, &mut enemies).await;
-    index::character::index_characters(&mut resources, &mut characters).await;
-    dbg!(resources);
+    // let mut resources = Mutex::new(vec![]);
+    // let mut enemies = vec![];
+    // let mut characters = vec![];
 
-    // if !root_dir.exists() {
-    //     first_run().await
-    // }
+    // index::enemy::index_enemies(&mut resources, &mut enemies).await;
+    // index::character::index_characters(&mut resources, &mut characters).await;
+    // dbg!(&resources);
+    // dbg!(root_dir);
+    // let res_len = resources.lock().unwrap().len();
+
+    // dbg!(res_len);
+    if !root_dir.exists() {
+        first_run().await
+    }
 
     // let player = soloud::Soloud::default().unwrap();
     // // Trying to decide if we should even have a greeting voice over
