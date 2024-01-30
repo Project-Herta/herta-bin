@@ -1,5 +1,4 @@
 use std::sync::Arc;
-use std::sync::Mutex;
 use std::sync::RwLock;
 
 use log::debug;
@@ -10,7 +9,7 @@ use crate::types::*;
 const ENEMY_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Category:Enemies";
 
 pub async fn index_enemies(
-    resource_pool: &mut RwLock<Vec<Arc<RwLock<Download>>>>,
+    resource_pool: &RwLock<Vec<Arc<RwLock<Download>>>>,
     enemies: &mut Vec<Enemy>,
 ) {
     let resp = reqwest::get(ENEMY_INDEX)

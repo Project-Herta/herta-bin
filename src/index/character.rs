@@ -1,5 +1,4 @@
 use std::sync::Arc;
-use std::sync::Mutex;
 use std::sync::RwLock;
 
 use log::{debug, info};
@@ -9,7 +8,7 @@ use crate::types::*;
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
 pub async fn index_characters(
-    resource_pool: &mut RwLock<Vec<Arc<RwLock<Download>>>>,
+    resource_pool: &RwLock<Vec<Arc<RwLock<Download>>>>,
     characters: &mut Vec<Character>,
 ) {
     let resp = reqwest::get(CHARACTER_INDEX)
