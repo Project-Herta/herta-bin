@@ -4,11 +4,18 @@ use reqwest::{
     header::{self, HeaderMap},
     Response,
 };
+use thiserror::Error;
 
-use std::fs::{create_dir_all, metadata, OpenOptions};
-use std::io::{self, prelude::*};
 use std::path::PathBuf;
 use std::{cell::RefCell, path::Path};
+use std::{
+    fs::{create_dir_all, metadata, OpenOptions},
+    sync::{Arc, RwLock},
+};
+use std::{
+    io::{self, prelude::*},
+    sync::RwLockReadGuard,
+};
 
 pub trait Downloadable: Clone {
     fn url(&self) -> &String;
@@ -39,24 +46,48 @@ where
     }
 }
 
-#[derive(Debug)]
+// #[derive(Error, Debug)]
+// #[derive(Error, Debug)]
+// pub enum FormatError {
+//     #[error("Invalid header (expected {expected:?}, got {found:?})")]
+//     InvalidHeader { expected: String, found: String },
+//     #[error("Missing attribute: {0}")]
+//     MissingAttribute(String),
+// }
+#[derive(Error, Debug)]
 pub enum DownloadError {
-    NetworkError(reqwest::Error),
-    CreateFileError(io::Error),
+    #[error("An error occurred while trying to get resource: {0}")]
+    NetworkError(#[from] reqwest::Error),
+
+    #[error("An error occurred while trying to create file: {0}")]
+    CreateFileError(#[from] io::Error),
+
+    #[error("The lock was poisoned")]
+    PoisonedLock,
+
+    #[error("Nothing to Download!")]
     NothingToDownload,
 }
 
-pub async fn download_resources<'a, D>(urls: &Vec<RefCell<D>>) -> Result<u64, DownloadError>
+pub async fn download_resources<'a, D>(
+    urls: &RwLock<Vec<Arc<RwLock<D>>>>,
+) -> Result<u64, DownloadError>
 where
     D: Downloadable,
 {
-    if urls.is_empty() {
+    if urls
+        .read()
+        .map_err(|_| DownloadError::PoisonedLock)?
+        .is_empty()
+    {
         return Err(DownloadError::NothingToDownload);
     }
 
+    // TODO: Use reqwest::get instead
     let resps = get(urls).await?;
     let mut downloaded_total = 0;
 
+    // TODO: Put GET requesting in this for loop, and change it
     for (download, resp) in resps {
         let root_dir = herta::data::get_root_dir(
             env!("CARGO_BIN_NAME"),
@@ -102,11 +133,15 @@ where
     Ok(downloaded_total)
 }
 
-async fn get<'a, D>(urls: &Vec<D>) -> Result<Vec<(D, Response)>, DownloadError>
+async fn get<'a, D>(urls: &RwLock<Vec<Arc<RwLock<D>>>>) -> Result<Vec<(D, Response)>, DownloadError>
 where
     D: Downloadable,
 {
-    let resps = urls.iter().map(|i| (reqwest::get(i.url()), i));
+    let resps = urls
+        .read()
+        .map_err(|_| DownloadError::PoisonedLock)?
+        .iter()
+        .map(|i| (reqwest::get(i.url()), i));
 
     // We're gonna have at most `url.len()`
     // responses so might as well pre-allocate
