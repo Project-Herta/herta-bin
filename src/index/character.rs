@@ -9,7 +9,7 @@ use crate::types::*;
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
 pub async fn index_characters(
-    resource_pool: &mut Mutex<Vec<Arc<RwLock<Download>>>>,
+    resource_pool: &mut RwLock<Vec<Arc<RwLock<Download>>>>,
     characters: &mut Vec<Character>,
 ) {
     let resp = reqwest::get(CHARACTER_INDEX)
@@ -22,7 +22,6 @@ pub async fn index_characters(
     for character in herta::extractor::index_characters(resp) {
         info!("Processing data for character {}", &character.name);
 
-        let pool = resource_pool.get_mut().unwrap();
         let mut character_resources = vec![];
 
         let rarity = character.rarity_image.clone();
@@ -64,6 +63,11 @@ pub async fn index_characters(
             character_resources.push(Download::new(DownloadType::VoiceOver, voice_url));
         }
 
+        // We lock the pool here when we will
+        // ACTUALLY use it. Previously, we'd
+        // await the acquisition of the lock
+        // way before we were going to use it
+        let mut pool = resource_pool.write().unwrap();
         character_resources.iter().for_each(|resource| {
             character.add_resource(resource.clone());
             pool.push(resource.clone());

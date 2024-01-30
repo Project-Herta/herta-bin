@@ -6,7 +6,11 @@
 use humansize::{format_size, FormatSizeOptions};
 use humantime::format_duration;
 use log::info;
-use std::{borrow::Borrow, sync::Mutex, time::Instant};
+use std::{
+    borrow::Borrow,
+    sync::{Mutex, RwLock},
+    time::Instant,
+};
 
 mod audio;
 mod data;
@@ -26,7 +30,7 @@ async fn first_run() {
     info!("========================================================");
 
     let start_time = Instant::now();
-    let mut global_resource_pool = Mutex::new(vec![]);
+    let mut global_resource_pool = RwLock::new(vec![]);
     let mut characters = vec![];
     let mut enemies = vec![];
 
@@ -53,7 +57,7 @@ async fn first_run() {
 
     info!(
         "{} resource(s) to be downloaded",
-        &global_resource_pool.lock().unwrap().len()
+        &global_resource_pool.read().unwrap().len()
     );
     // let download_total = downloader::download_resources(&global_resource_pool)
     //     .await

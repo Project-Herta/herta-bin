@@ -10,7 +10,7 @@ use crate::types::*;
 const ENEMY_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Category:Enemies";
 
 pub async fn index_enemies(
-    resource_pool: &mut Mutex<Vec<Arc<RwLock<Download>>>>,
+    resource_pool: &mut RwLock<Vec<Arc<RwLock<Download>>>>,
     enemies: &mut Vec<Enemy>,
 ) {
     let resp = reqwest::get(ENEMY_INDEX)
@@ -23,7 +23,6 @@ pub async fn index_enemies(
     for enemy in herta::extractor::index_enemies(resp) {
         debug!("Processing data for enemy: {}", &enemy.name);
 
-        let pool = resource_pool.get_mut().unwrap();
         let mut enemy_resources = vec![];
 
         let html = reqwest::get(&enemy.link)
@@ -43,6 +42,11 @@ pub async fn index_enemies(
         enemy.resistances = herta::extractor::get_enemy_resistances(&html);
         enemy.debuff_resistances = herta::extractor::get_enemy_debuff_resistances(&html);
 
+        // We lock the pool here when we will
+        // ACTUALLY use it. Previously, we'd
+        // await the acquisition of the lock
+        // way before we were going to use it
+        let mut pool = resource_pool.write().unwrap();
         enemy_resources.iter().for_each(|resource| {
             enemy.add_resource(resource.clone());
             pool.push(resource.clone());
