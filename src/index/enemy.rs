@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use std::sync::RwLock;
 
-use log::debug;
+use log::info;
 
 use crate::types::Enemy;
 use crate::types::*;
@@ -20,7 +20,7 @@ pub async fn index_enemies(
         .unwrap();
 
     for enemy in herta::extractor::index_enemies(resp) {
-        debug!("Processing data for enemy: {}", &enemy.name);
+        info!("Processing data for enemy: {}", &enemy.name);
 
         let mut enemy_resources = vec![];
 
