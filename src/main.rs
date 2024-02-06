@@ -36,11 +36,11 @@ async fn first_run() {
     let start_time = Instant::now();
     let global_resource_pool = RwLock::new(vec![]);
     let mut characters = vec![];
-    // let mut enemies = vec![];
+    let mut enemies = vec![];
 
     info!("Waiting for both tasks to finish");
     index::character::index_characters(&global_resource_pool, &mut characters).await;
-    // index::enemy::index_enemies(&global_resource_pool, &mut enemies).await;
+    index::enemy::index_enemies(&global_resource_pool, &mut enemies).await;
 
     let scraping_elapsed = start_time.elapsed();
     info!("Indexing took {}", format_duration(scraping_elapsed));

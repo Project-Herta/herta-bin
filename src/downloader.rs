@@ -120,6 +120,7 @@ where
         }
 
         let mut savefile = OpenOptions::new()
+            .create(true)
             .write(true)
             .open(&filename)
             .map_err(DownloadError::CreateFileError)?;
