@@ -1,21 +1,20 @@
 use futures_util::StreamExt;
+use log::debug;
 use log::info;
-use reqwest::{
-    header::{self, HeaderMap},
-    Response,
-};
+use reqwest::header;
+use reqwest::header::HeaderMap;
 use thiserror::Error;
 
+use std::cell::RefCell;
+use std::fs::create_dir_all;
+use std::fs::metadata;
+use std::fs::OpenOptions;
+use std::io;
+use std::io::prelude::*;
+use std::path::Path;
 use std::path::PathBuf;
-use std::{cell::RefCell, path::Path};
-use std::{
-    fs::{create_dir_all, metadata, OpenOptions},
-    sync::{Arc, RwLock},
-};
-use std::{
-    io::{self, prelude::*},
-    sync::RwLockReadGuard,
-};
+use std::sync::Arc;
+use std::sync::RwLock;
 
 pub trait Downloadable: Clone {
     fn url(&self) -> &String;
@@ -46,6 +45,7 @@ where
     }
 }
 
+// DEPRECATED: Delete these on the next commit
 // #[derive(Error, Debug)]
 // #[derive(Error, Debug)]
 // pub enum FormatError {
@@ -69,6 +69,10 @@ pub enum DownloadError {
     NothingToDownload,
 }
 
+// This lint has to be allowed since we cant really
+// have another massive-ish code change
+// MIGHT DO: Swap `std::sync::RwLock` for `tokio::sync::RwLock`
+#[allow(clippy::await_holding_lock)]
 pub async fn download_resources<'a, D>(
     urls: &RwLock<Vec<Arc<RwLock<D>>>>,
 ) -> Result<u64, DownloadError>
@@ -83,23 +87,28 @@ where
         return Err(DownloadError::NothingToDownload);
     }
 
-    // TODO: Use reqwest::get instead
-    let resps = get(urls).await?;
+    // let resps = get(urls).await?;
     let mut downloaded_total = 0;
 
     // TODO: Put GET requesting in this for loop, and change it
-    for (download, resp) in resps {
+    for url in urls.read().map_err(|_| DownloadError::PoisonedLock)?.iter() {
         let root_dir = herta::data::get_root_dir(
             env!("CARGO_BIN_NAME"),
             Some(env!("CARGO_PKG_VERSION_MAJOR")),
         )
-        .join(download.base_dir());
+        .join(
+            url.read()
+                .map_err(|_| DownloadError::PoisonedLock)?
+                .base_dir(),
+        );
 
         #[allow(unused_must_use)]
         if !root_dir.exists() {
             create_dir_all(&root_dir);
         }
 
+        debug!("Processing URL {:?}...", url.read().unwrap().url(),);
+        let resp = reqwest::get(url.read().map_err(|_| DownloadError::PoisonedLock)?.url()).await?;
         let headers = resp.headers().clone();
         let mut stream = resp.bytes_stream();
 
@@ -116,7 +125,11 @@ where
             .open(&filename)
             .map_err(DownloadError::CreateFileError)?;
 
-        info!("Saving to {}...", &filename.display());
+        info!(
+            "Saving {:?} to {:?}...",
+            url.read().unwrap().url(),
+            &filename.display()
+        );
         while let Some(chunk) = stream.next().await {
             let bytes = chunk.unwrap();
             downloaded_total += bytes.len() as u64;
@@ -127,35 +140,38 @@ where
         }
 
         let filename = filename.canonicalize().unwrap();
-        download.borrow_mut().mark_downloaded(filename);
+        url.write()
+            .map_err(|_| DownloadError::PoisonedLock)?
+            .mark_downloaded(filename);
     }
 
     Ok(downloaded_total)
 }
 
-async fn get<'a, D>(urls: &RwLock<Vec<Arc<RwLock<D>>>>) -> Result<Vec<(D, Response)>, DownloadError>
-where
-    D: Downloadable,
-{
-    let resps = urls
-        .read()
-        .map_err(|_| DownloadError::PoisonedLock)?
-        .iter()
-        .map(|i| (reqwest::get(i.url()), i));
+// DEPRECATED: Delete these on the next commit
+// async fn get<'a, D>(urls: &RwLock<Vec<Arc<RwLock<D>>>>) -> Result<Vec<(D, Response)>, DownloadError>
+// where
+//     D: Downloadable,
+// {
+//     let resps = urls
+//         .read()
+//         .map_err(|_| DownloadError::PoisonedLock)?
+//         .iter()
+//         .map(|i| (reqwest::get(i.url()), i));
 
-    // We're gonna have at most `url.len()`
-    // responses so might as well pre-allocate
-    // for this to save time and memory
-    let mut res = Vec::with_capacity(urls.len());
-    for (resp, download) in resps {
-        res.push((
-            download.clone(),
-            resp.await.map_err(DownloadError::NetworkError)?,
-        ));
-    }
+//     // We're gonna have at most `url.len()`
+//     // responses so might as well pre-allocate
+//     // for this to save time and memory
+//     let mut res = Vec::with_capacity(urls.len());
+//     for (resp, download) in resps {
+//         res.push((
+//             download.clone(),
+//             resp.await.map_err(DownloadError::NetworkError)?,
+//         ));
+//     }
 
-    Ok(res)
-}
+//     Ok(res)
+// }
 
 fn get_filename(root_dir: &Path, headers: HeaderMap) -> PathBuf {
     let raw = headers

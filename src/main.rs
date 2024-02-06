@@ -8,8 +8,11 @@ use humansize::FormatSizeOptions;
 use humantime::format_duration;
 use log::info;
 use log::warn;
+use std::sync::Arc;
 use std::sync::RwLock;
 use std::time::Instant;
+
+use crate::types::Download;
 
 mod audio;
 mod data;
@@ -31,20 +34,20 @@ async fn first_run() {
     let start_time = Instant::now();
     let global_resource_pool = RwLock::new(vec![]);
     let mut characters = vec![];
-    let mut enemies = vec![];
+    // let mut enemies = vec![];
 
     info!("Waiting for both tasks to finish");
     index::character::index_characters(&global_resource_pool, &mut characters).await;
-    index::enemy::index_enemies(&global_resource_pool, &mut enemies).await;
+    // index::enemy::index_enemies(&global_resource_pool, &mut enemies).await;
 
     let scraping_elapsed = start_time.elapsed();
     info!("Indexing took {}", format_duration(scraping_elapsed));
 
-    info!(
-        "Indexed {} characters, {} enemies",
-        characters.len(),
-        enemies.len()
-    );
+    // info!(
+    //     "Indexed {} characters, {} enemies",
+    //     characters.len(),
+    //     enemies.len()
+    // );
 
     // for character in characters {
     //     data::write_character(&character);
@@ -58,17 +61,18 @@ async fn first_run() {
         "{} resource(s) to be downloaded",
         &global_resource_pool.read().unwrap().len()
     );
-    // let download_total = downloader::download_resources(&global_resource_pool)
-    //     .await
-    //     .unwrap();
-    // let download = start_time.elapsed();
-    // let ops = FormatSizeOptions::default();
-    // let download_total_size = format_size(download_total, ops);
-    // info!(
-    //     "First run took {}, {} downloaded",
-    //     format_duration(download),
-    //     download_total_size
-    // );
+
+    let download_total = downloader::download_resources(&global_resource_pool)
+        .await
+        .unwrap();
+    let download = start_time.elapsed();
+    let ops = FormatSizeOptions::default();
+    let download_total_size = format_size(download_total, ops);
+    info!(
+        "First run took {}, {} downloaded",
+        format_duration(download),
+        download_total_size
+    );
 
     info!("Everything's ready, starting...")
 }
