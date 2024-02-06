@@ -46,10 +46,13 @@ pub async fn index_enemies(
         // await the acquisition of the lock
         // way before we were going to use it
         let mut pool = resource_pool.write().unwrap();
-        enemy_resources.iter().for_each(|resource| {
-            enemy.add_resource(resource.clone());
-            pool.push(resource.clone());
-        });
+        enemy_resources
+            .iter()
+            .filter_map(|res| res.clone())
+            .for_each(|resource| {
+                enemy.add_resource(resource.clone());
+                pool.push(resource.clone());
+            });
         enemies.push(enemy);
     }
 }

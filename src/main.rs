@@ -83,7 +83,7 @@ async fn first_run() {
 async fn main() {
     logger::setup();
     let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
-    let first_run_file = root_dir.with_file_name(".first_run");
+    let first_run_file = root_dir.join(".first_run");
 
     // let mut resources = Mutex::new(vec![]);
     // let mut enemies = vec![];
@@ -96,6 +96,7 @@ async fn main() {
     // let res_len = resources.lock().unwrap().len();
 
     // dbg!(res_len);
+
     if !first_run_file.exists() {
         first_run().await;
         File::create(first_run_file).unwrap();

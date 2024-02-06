@@ -67,12 +67,16 @@ impl Downloadable for Download {
 }
 
 impl Download {
-    pub fn new(download_type: DownloadType, url: String) -> Arc<RwLock<Download>> {
-        Arc::new(RwLock::new(Self {
-            dl_type: download_type,
-            url,
-            file: None,
-        }))
+    pub fn new(download_type: DownloadType, url: String) -> Option<Arc<RwLock<Download>>> {
+        if url.starts_with('/') {
+            None
+        } else {
+            Some(Arc::new(RwLock::new(Self {
+                dl_type: download_type,
+                url,
+                file: None,
+            })))
+        }
     }
 
     fn is_downloaded(&self) -> bool {
@@ -107,9 +111,7 @@ impl From<herta::extractor::Character> for Character {
 
 impl Character {
     pub fn add_resource(&mut self, resource: Arc<RwLock<Download>>) {
-        if resource.read().unwrap().url().starts_with("https://") {
-            self.resources.push(resource)
-        }
+        self.resources.push(resource)
     }
 }
 
@@ -219,8 +221,6 @@ impl From<herta::extractor::Enemy> for Enemy {
 
 impl Enemy {
     pub fn add_resource(&mut self, resource: Arc<RwLock<Download>>) {
-        if resource.read().unwrap().url().starts_with("https://") {
-            self.resources.push(resource)
-        }
+        self.resources.push(resource)
     }
 }

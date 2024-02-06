@@ -67,10 +67,13 @@ pub async fn index_characters(
         // await the acquisition of the lock
         // way before we were going to use it
         let mut pool = resource_pool.write().unwrap();
-        character_resources.iter().for_each(|resource| {
-            character.add_resource(resource.clone());
-            pool.push(resource.clone());
-        });
+        character_resources
+            .iter()
+            .filter_map(|res| res.clone())
+            .for_each(|resource| {
+                character.add_resource(resource.clone());
+                pool.push(resource.clone());
+            });
 
         characters.push(character);
     }
