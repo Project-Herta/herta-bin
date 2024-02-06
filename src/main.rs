@@ -30,7 +30,7 @@ async fn first_run() {
     info!("Resources will be indexed and downloaded for faster");
     info!("startup times in the future");
     info!("");
-    warn!("This procedure will take around 10 minutes (including downloads)");
+    warn!("This procedure will take around 20 minutes (including downloads)");
     info!("========================================================");
 
     let start_time = Instant::now();
@@ -45,19 +45,19 @@ async fn first_run() {
     let scraping_elapsed = start_time.elapsed();
     info!("Indexing took {}", format_duration(scraping_elapsed));
 
-    // info!(
-    //     "Indexed {} characters, {} enemies",
-    //     characters.len(),
-    //     enemies.len()
-    // );
+    info!(
+        "Indexed {} characters, {} enemies",
+        characters.len(),
+        enemies.len()
+    );
 
-    // for character in characters {
-    //     data::write_character(&character);
-    // }
+    for character in characters {
+        data::write_character(&character);
+    }
 
-    // for enemy in enemies {
-    //     data::write_enemy(&enemy);
-    // }
+    for enemy in enemies {
+        data::write_enemy(&enemy);
+    }
 
     info!(
         "{} resource(s) to be downloaded",

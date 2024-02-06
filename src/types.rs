@@ -84,7 +84,7 @@ impl Download {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Character {
     pub name: String,
     link: String,
@@ -197,7 +197,7 @@ impl TryFrom<String> for CharacterPath {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct Enemy {
     pub link: String,
     pub name: String,

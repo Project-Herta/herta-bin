@@ -14,7 +14,7 @@ herta-lib = "1.1.7"
 url = "2.4.0"
 futures-util = "0.3.28"
 humantime = "2.1.0"
-serde = { version = "1.0.183", features = ["derive"] }
+serde = { version = "1.0.183", features = ["derive", "rc"] }
 soloud = "1.0.5"
 rand = "0.8.5"
 humansize = "2.1.3"
