@@ -1,0 +1,62 @@
+concurrency:
+  cancel-in-progress: true
+  group: herta-build
+
+on:
+  push:
+    tags: v*
+    branches: master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        target:
+          # Windows
+          - i686-pc-windows-gnu
+          - x86_64-pc-windows-gnu
+          # Linux (musl for raspi)
+          - aarch64-unknown-linux-musl
+          - i686-unknown-linux-gnu
+          - x86_64-unknown-linux-gnu
+
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions-rs/toolchain@v1
+        name: Setup rust
+        with:
+          target: ${{ matrix.target }}
+          toolchain: stable
+          override: true
+
+      - uses: actions-rs/cargo@v1
+        name: Build release (${{ matrix.target }})
+        with:
+          use-cross: true
+          command: build
+          args: --release --target ${{ matrix.target }}
+
+      - name: Prepare artifacts (linux)
+        shell: true
+        run: |
+          BIN_TARGET=$(echo ${{ matrix.target }} | cut -d/ -f 3 | cut -d- -f 1)
+          cp target/${{ matrix.target }}/release/herta-bin herta-bin.$BIN_TARGET
+        if: contains(matrix.target, 'linux')
+
+      - name: Prepare artifacts (windows)
+        shell: true
+        run: |
+          BIN_TARGET=$(echo ${{ matrix.target }} | cut -d/ -f 3 | cut -d- -f 1)
+          cp target/${{ matrix.target }}/release/herta-bin.exe herta-bin-$BIN_TARGET.exe
+        if: contains(matrix.target, 'windows')
+
+      - uses: softprops/action-gh-release@v1
+        with:
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          files: herta-bin*
+        if: startsWith(github.ref, 'refs/tags/')
