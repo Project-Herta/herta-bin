@@ -27,11 +27,11 @@ jobs:
 
       - name: Install x86 Build Dependencies
         if: ${{ matrix.target == 'i686-pc-windows-gnu' || matrix.target == 'i686-unknown-linux-gnu' }}
-        run: sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install libssl-dev:i386 clang
+        run: sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install libssl-dev:i386 clang cmake
 
       - name: Install x86_64 Build Dependencies
         if: ${{ matrix.target != 'i686-pc-windows-gnu' && matrix.target != 'i686-unknown-linux-gnu' }}
-        run: sudo apt-get update && sudo apt-get install pkg-config libssl-dev clang
+        run: sudo apt-get update && sudo apt-get install pkg-config libssl-dev clang cmake
 
       - uses: actions-rs/toolchain@v1
         name: Setup rust
