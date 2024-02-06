@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 fern_colored = { version = "0.6.1", features = ["colored"] }
 log = "0.4.19"
-reqwest = { version = "0.11.18", features = ["stream"] }
+reqwest = { version = "0.11.18", features = ["stream", "native-tls-vendored"] }
 tokio = { version = "1.29.1", features = ["full"] }
 herta-lib = "1.1.7"
 url = "2.4.0"
