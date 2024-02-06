@@ -89,18 +89,6 @@ async fn main() {
     let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
     let first_run_file = root_dir.join(".first_run");
 
-    // let mut resources = Mutex::new(vec![]);
-    // let mut enemies = vec![];
-    // let mut characters = vec![];
-
-    // index::enemy::index_enemies(&mut resources, &mut enemies).await;
-    // index::character::index_characters(&mut resources, &mut characters).await;
-    // dbg!(&resources);
-    // dbg!(root_dir);
-    // let res_len = resources.lock().unwrap().len();
-
-    // dbg!(res_len);
-
     if !first_run_file.exists() {
         first_run().await;
         File::create(first_run_file).unwrap();

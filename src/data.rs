@@ -19,7 +19,7 @@ pub fn write_character(character: &Character) {
         .open(filename)
         .unwrap();
 
-    // TODO: Remove this warning below
+    // MIGHT DO: Remove this warning below
     // when we start caring for this
     // guy's return type, because we should
     // someday
@@ -47,7 +47,7 @@ pub fn write_enemy(enemy: &Enemy) {
         .open(filename)
         .unwrap();
 
-    // TODO: Remove this warning below
+    // MIGHT DO: Remove this warning below
     // when we start caring for this
     // guy's return type, because we should
     // someday
