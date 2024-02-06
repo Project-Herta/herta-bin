@@ -17,14 +17,21 @@ jobs:
           # Windows
           - i686-pc-windows-gnu
           - x86_64-pc-windows-gnu
-          # Linux (musl for raspi)
-          - aarch64-unknown-linux-musl
+          # Linux
           - i686-unknown-linux-gnu
           - x86_64-unknown-linux-gnu
 
 
     steps:
       - uses: actions/checkout@v2
+
+      - name: Install x86 Build Dependencies
+        if: ${{ matrix.target == 'i686-pc-windows-gnu' || matrix.target == 'i686-unknown-linux-gnu' }}
+        run: sudo dpkg --add-architecture i386 && sudo apt-get update && sudo apt-get install libssl-dev:i386 clang
+
+      - name: Install x86_64 Build Dependencies
+        if: ${{ matrix.target != 'i686-pc-windows-gnu' && matrix.target != 'i686-unknown-linux-gnu' }}
+        run: sudo apt-get update && sudo apt-get install pkg-config libssl-dev clang
 
       - uses: actions-rs/toolchain@v1
         name: Setup rust
