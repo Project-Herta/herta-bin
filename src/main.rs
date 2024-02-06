@@ -6,6 +6,7 @@
 use humansize::format_size;
 use humansize::FormatSizeOptions;
 use humantime::format_duration;
+use log::debug;
 use log::info;
 use log::warn;
 use std::fs::File;
@@ -51,14 +52,6 @@ async fn first_run() {
         enemies.len()
     );
 
-    for character in characters {
-        data::write_character(&character);
-    }
-
-    for enemy in enemies {
-        data::write_enemy(&enemy);
-    }
-
     info!(
         "{} resource(s) to be downloaded",
         &global_resource_pool.read().unwrap().len()
@@ -76,6 +69,17 @@ async fn first_run() {
         download_total_size
     );
 
+    info!("Writing character data");
+    for character in characters {
+        data::write_character(&character);
+        debug!("Data for character {} written to disk", character.name);
+    }
+
+    info!("Writing enemy data");
+    for enemy in enemies {
+        data::write_enemy(&enemy);
+        debug!("Data for enemy {} written to disk", enemy.name);
+    }
     info!("Everything's ready, starting...")
 }
 
