@@ -107,7 +107,9 @@ impl From<herta::extractor::Character> for Character {
 
 impl Character {
     pub fn add_resource(&mut self, resource: Arc<RwLock<Download>>) {
-        self.resources.push(resource)
+        if resource.read().unwrap().url().starts_with("https://") {
+            self.resources.push(resource)
+        }
     }
 }
 
@@ -217,6 +219,8 @@ impl From<herta::extractor::Enemy> for Enemy {
 
 impl Enemy {
     pub fn add_resource(&mut self, resource: Arc<RwLock<Download>>) {
-        self.resources.push(resource)
+        if resource.read().unwrap().url().starts_with("https://") {
+            self.resources.push(resource)
+        }
     }
 }
