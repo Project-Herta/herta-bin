@@ -36,7 +36,6 @@ jobs:
       - uses: actions-rs/cargo@v1
         name: Build release (${{ matrix.target }})
         with:
-          use-cross: true
           command: build
           args: --release --target ${{ matrix.target }}
 
