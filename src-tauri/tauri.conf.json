@@ -56,10 +56,10 @@
     "windows": [
       {
         "fullscreen": false,
-        "height": 600,
+        "height": 650,
         "resizable": true,
         "title": "Herta",
-        "width": 800
+        "width": 900
       }
     ]
   }

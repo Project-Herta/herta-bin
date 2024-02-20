@@ -1,38 +1,41 @@
-.App {
+@media (orientation: portrait) {
+  .herta-logo {
+    width: 50%;
+    height: 50%;
+  }
+
+  progress+p {
+    font-size: 10px;
+  }
+}
+
+body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+h1,
+p {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.app {
+  margin-top: 10vh;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.herta-logo {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+progress {
+  margin-bottom: 0 !important;
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+progress+p {
+  margin-top: 0.5em;
+  margin-bottom: 1.75rem;
+  font-size: 0.8rem;
 }

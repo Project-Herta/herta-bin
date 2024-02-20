@@ -1,13 +1,74 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+@import url('https://fonts.googleapis.com/css2?family=Raleway:ital,wght@0,100..900;1,100..900&display=swap');
+
+@media (prefers-color-scheme: light) {
+  :root {
+    --body-bg: white;
+    --body-fg: #5a21c5;
+    --ui-bg: #b58dff;
+    --ui-fg: #7032e4;
+  }
+
+  button {
+    color: var(--body-bg) !important;
+    background-color: var(--ui-fg) !important;
+  }
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@media (prefers-color-scheme: dark) {
+  :root {
+    --body-bg: #361672;
+    --body-fg: #ccbfe4;
+    --ui-bg: #2b1258;
+    --ui-fg: #8356d6;
+  }
+}
+
+:root {
+  --prog-br: 6px;
+}
+
+body {
+  background-color: var(--body-bg);
+  font-family: "Raleway", sans-serif;
+  font-weight: 300;
+  color: var(--body-fg)
+}
+
+button {
+  font-weight: 500;
+  border: none;
+  color: var(--ui-fg);
+  background-color: var(--ui-bg);
+  padding: 9px 12px;
+  border-radius: 5px;
+}
+
+/* Firefox/Background */
+progress[value] {
+  background-color: var(--ui-bg);
+  width: 100%;
+  border-radius: var(--prog-br);
+  margin-bottom: 1.75rem;
+
+  /* Firefox */
+  appearance: none;
+  border: none;
+}
+
+/* Firefox/Foreground */
+progress[value]::-moz-progress-bar {
+  background-color: var(--ui-fg) !important;
+  border-radius: var(--prog-br);
+}
+
+/* Chrome/Background */
+progress[value]::-webkit-progress-bar {
+  background-color: var(--ui-bg);
+  border-radius: var(--prog-br);
+}
+
+/* Chrome/Foreground */
+progress[value]::-webkit-progress-value {
+  background-color: var(--ui-fg) !important;
+  border-radius: var(--prog-br);
 }
