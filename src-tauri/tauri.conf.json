@@ -16,7 +16,7 @@
     },
     "bundle": {
       "active": true,
-      "category": "DeveloperTool",
+      "category": "Utility",
       "copyright": "",
       "deb": {
         "depends": []
@@ -30,7 +30,7 @@
         "icons/icon.ico"
       ],
       "identifier": "xz.tarball.herta",
-      "longDescription": "",
+      "longDescription": "Herta is a program to assist you in your Honkai: Star Rail adventure",
       "macOS": {
         "entitlements": null,
         "exceptionDomain": "",
@@ -39,7 +39,7 @@
         "signingIdentity": null
       },
       "resources": [],
-      "shortDescription": "",
+      "shortDescription": "Honkai: Star Rail Assistant",
       "targets": "all",
       "windows": {
         "certificateThumbprint": null,
