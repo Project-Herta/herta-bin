@@ -1,23 +1,16 @@
-import logo from './logo.svg';
 import './App.css';
+import logo from './icon.png';
+
+import { invoke } from "@tauri-apps/api";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="app" onLoad={() => { invoke("hello_world"); }}>
+      <img className="herta-logo" src={logo} alt="Project Herta Logo" />
+      <h1>Herta needs to get stuff!</h1>
+      <p>Miss Herta needs to collect information before everything starts</p>
+      <progress id="first-run" value="0"></progress>
+      <p id="first-run-label">Currently on:</p>
     </div>
   );
 }

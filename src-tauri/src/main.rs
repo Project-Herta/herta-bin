@@ -86,6 +86,15 @@ async fn first_run() {
     info!("Everything's ready, starting...")
 }
 
+#[tauri::command]
+async fn hello_world<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+    window: tauri::Window<R>,
+) -> Option<i32> {
+    println!("Rust code invoked from JS");
+
+    Some(1)
+}
 #[tokio::main]
 async fn main() {
     logger::setup();
@@ -98,6 +107,7 @@ async fn main() {
     // }
 
     tauri::Builder::default()
+        .invoke_handler(tauri::generate_handler![hello_world])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
