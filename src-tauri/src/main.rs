@@ -12,11 +12,13 @@ use humantime::format_duration;
 use log::debug;
 use log::info;
 use log::warn;
+use serde::Serialize;
 use std::fs::File;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::RwLock;
 use std::time::Instant;
+use tauri::{Manager, Window};
 
 use crate::types::Download;
 
@@ -86,15 +88,28 @@ async fn first_run() {
     info!("Everything's ready, starting...")
 }
 
+#[derive(Clone, Serialize)]
+struct DownloadProg {
+    progress: u32,
+    message: String,
+}
+
 #[tauri::command]
 async fn hello_world<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
 ) -> Option<i32> {
-    println!("Rust code invoked from JS");
+    window.emit(
+        "download-progress",
+        DownloadProg {
+            progress: 1,
+            message: "FUck you".to_string(),
+        },
+    );
 
     Some(1)
 }
+
 #[tokio::main]
 async fn main() {
     logger::setup();
