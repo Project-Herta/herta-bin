@@ -1,3 +1,4 @@
+use ::tauri::{Runtime, Window};
 use std::sync::Arc;
 use std::sync::RwLock;
 
@@ -8,9 +9,10 @@ use crate::types::*;
 
 const ENEMY_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Category:Enemies";
 
-pub async fn index_enemies(
+pub async fn index_enemies<R: Runtime>(
     resource_pool: &RwLock<Vec<Arc<RwLock<Download>>>>,
     enemies: &mut Vec<Enemy>,
+    window: &Window<R>,
 ) {
     let resp = reqwest::get(ENEMY_INDEX)
         .await

@@ -6,7 +6,7 @@ import { listen } from "@tauri-apps/api/event";
 
 function App() {
   return (
-    <div className="app" onLoad={() => { invoke("hello_world"); }}>
+    <div className="app" >
       <img className="herta-logo" src={logo} alt="Project Herta Logo" />
       <h1>Herta needs to get stuff!</h1>
       <p>Miss Herta needs to collect information before everything starts</p>

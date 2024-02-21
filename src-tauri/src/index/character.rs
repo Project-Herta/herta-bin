@@ -1,3 +1,4 @@
+use ::tauri::{Runtime, Window};
 use std::sync::Arc;
 use std::sync::RwLock;
 
@@ -7,9 +8,10 @@ use crate::types::*;
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
-pub async fn index_characters(
+pub async fn index_characters<R: Runtime>(
     resource_pool: &RwLock<Vec<Arc<RwLock<Download>>>>,
     characters: &mut Vec<Character>,
+    window: &Window<R>,
 ) {
     let resp = reqwest::get(CHARACTER_INDEX)
         .await

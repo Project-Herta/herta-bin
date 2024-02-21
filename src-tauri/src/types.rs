@@ -5,6 +5,8 @@ use std::sync::RwLock;
 
 use crate::downloader::Downloadable;
 
+pub mod tauri;
+
 const STAR_CHAR: &str = "✦";
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]

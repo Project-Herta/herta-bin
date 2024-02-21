@@ -18,7 +18,6 @@ use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::RwLock;
 use std::time::Instant;
-use tauri::{Manager, Window};
 
 use crate::types::Download;
 
@@ -29,8 +28,12 @@ mod index;
 mod logger;
 mod types;
 
-async fn first_run() {
-    // TODO: Replace with INFO logs
+#[tauri::command]
+#[allow(dead_code)]
+async fn begin_first_run<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+    window: tauri::Window<R>,
+) -> Result<(), String> {
     info!("========================================================");
     info!("First Run!");
     info!("Resources will be indexed and downloaded for faster");
@@ -45,8 +48,8 @@ async fn first_run() {
     let mut enemies = vec![];
 
     info!("Waiting for both tasks to finish");
-    index::character::index_characters(&global_resource_pool, &mut characters).await;
-    index::enemy::index_enemies(&global_resource_pool, &mut enemies).await;
+    index::character::index_characters(&global_resource_pool, &mut characters, &window).await;
+    index::enemy::index_enemies(&global_resource_pool, &mut enemies, &window).await;
 
     let scraping_elapsed = start_time.elapsed();
     info!("Indexing took {}", format_duration(scraping_elapsed));
@@ -62,17 +65,17 @@ async fn first_run() {
         &global_resource_pool.read().unwrap().len()
     );
 
-    let download_total = downloader::download_resources(&global_resource_pool)
-        .await
-        .unwrap();
-    let download = start_time.elapsed();
-    let ops = FormatSizeOptions::default();
-    let download_total_size = format_size(download_total, ops);
-    info!(
-        "First run took {}, {} downloaded",
-        format_duration(download),
-        download_total_size
-    );
+    // let download_total = downloader::download_resources(&global_resource_pool)
+    //     .await
+    //     .unwrap();
+    // let download = start_time.elapsed();
+    // let ops = FormatSizeOptions::default();
+    // let download_total_size = format_size(download_total, ops);
+    // info!(
+    //     "First run took {}, {} downloaded",
+    //     format_duration(download),
+    //     download_total_size
+    // );
 
     info!("Writing character data");
     for character in characters {
@@ -85,29 +88,9 @@ async fn first_run() {
         data::write_enemy(&enemy);
         debug!("Data for enemy {} written to disk", enemy.name);
     }
-    info!("Everything's ready, starting...")
-}
+    info!("Everything's ready, starting...");
 
-#[derive(Clone, Serialize)]
-struct DownloadProg {
-    progress: u32,
-    message: String,
-}
-
-#[tauri::command]
-async fn hello_world<R: tauri::Runtime>(
-    app: tauri::AppHandle<R>,
-    window: tauri::Window<R>,
-) -> Option<i32> {
-    window.emit(
-        "download-progress",
-        DownloadProg {
-            progress: 1,
-            message: "FUck you".to_string(),
-        },
-    );
-
-    Some(1)
+    Ok(())
 }
 
 #[tokio::main]
@@ -122,7 +105,7 @@ async fn main() {
     // }
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![hello_world])
+        .invoke_handler(tauri::generate_handler![begin_first_run])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
