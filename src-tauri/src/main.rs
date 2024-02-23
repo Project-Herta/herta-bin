@@ -93,15 +93,15 @@ async fn begin_first_run<R: tauri::Runtime>(
 
     info!("Writing character data");
     for character in characters {
-        // data::write_character(&character);
+        data::write_character(&character);
         debug!("Data for character {} written to disk", character.name);
     }
 
-    // info!("Writing enemy data");
-    // for enemy in enemies {
-    //     data::write_enemy(&enemy);
-    //     debug!("Data for enemy {} written to disk", enemy.name);
-    // }
+    info!("Writing enemy data");
+    for enemy in enemies {
+        data::write_enemy(&enemy);
+        debug!("Data for enemy {} written to disk", enemy.name);
+    }
     info!("Everything's ready, starting...");
 
     Ok(())
