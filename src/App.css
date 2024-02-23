@@ -30,6 +30,16 @@ p {
   display: block;
 }
 
+.warn {
+  color: #c41515;
+  font-weight: 700;
+  margin-top: 9px;
+}
+
+p:has(+.warn) {
+  margin-bottom: 0;
+}
+
 progress {
   margin-bottom: 0 !important;
 }

@@ -43,22 +43,11 @@ button {
   border-radius: 5px;
 }
 
-/* Firefox/Background */
 progress[value] {
   background-color: var(--ui-bg);
   width: 100%;
   border-radius: var(--prog-br);
   margin-bottom: 1.75rem;
-
-  /* Firefox */
-  appearance: none;
-  border: none;
-}
-
-/* Firefox/Foreground */
-progress[value]::-moz-progress-bar {
-  background-color: var(--ui-fg) !important;
-  border-radius: var(--prog-br);
 }
 
 /* Chrome/Background */
