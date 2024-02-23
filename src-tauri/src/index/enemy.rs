@@ -21,8 +21,23 @@ pub async fn index_enemies<R: Runtime>(
         .await
         .unwrap();
 
+    window.emit(
+        "download-progress",
+        crate::types::DownloadProgress {
+            current_progress: 0,
+            message: format!("Indexing enemies"),
+        },
+    );
+
     for enemy in herta::extractor::index_enemies(resp) {
         info!("Processing data for enemy: {}", &enemy.name);
+        window.emit(
+            "download-progress",
+            crate::types::DownloadProgress {
+                current_progress: 0,
+                message: format!("Indexing enemy: {}", enemy.name),
+            },
+        );
 
         let mut enemy_resources = vec![];
 

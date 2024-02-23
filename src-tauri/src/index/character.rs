@@ -20,8 +20,23 @@ pub async fn index_characters<R: Runtime>(
         .await
         .unwrap();
 
+    window.emit(
+        "download-progress",
+        crate::types::DownloadProgress {
+            current_progress: 0,
+            message: format!("Indexing characters"),
+        },
+    );
+
     for character in herta::extractor::index_characters(resp) {
         info!("Processing data for character {}", &character.name);
+        window.emit(
+            "download-progress",
+            crate::types::DownloadProgress {
+                current_progress: 0,
+                message: format!("Indexing character: {}", character.name),
+            },
+        );
 
         let mut character_resources = vec![];
 

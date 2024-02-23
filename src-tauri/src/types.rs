@@ -6,6 +6,7 @@ use std::sync::RwLock;
 use crate::downloader::Downloadable;
 
 pub mod frontend;
+pub use frontend::*;
 
 const STAR_CHAR: &str = "✦";
 

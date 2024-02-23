@@ -10,6 +10,7 @@ use humansize::format_size;
 use humansize::FormatSizeOptions;
 use humantime::format_duration;
 use log::debug;
+use log::error;
 use log::info;
 use log::warn;
 use serde::Serialize;
@@ -17,6 +18,8 @@ use std::fs::File;
 use std::path::PathBuf;
 use std::sync::Arc;
 use std::sync::RwLock;
+use std::thread::sleep;
+use std::time::Duration;
 use std::time::Instant;
 
 use crate::types::Download;
@@ -34,6 +37,7 @@ async fn begin_first_run<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
 ) -> Result<(), String> {
+    sleep(Duration::from_secs(1));
     info!("========================================================");
     info!("First Run!");
     info!("Resources will be indexed and downloaded for faster");
@@ -41,6 +45,16 @@ async fn begin_first_run<R: tauri::Runtime>(
     info!("");
     warn!("This procedure will take around 20 minutes (including downloads)");
     info!("========================================================");
+
+    window
+        .emit(
+            "download-progress",
+            types::DownloadProgress {
+                current_progress: 0,
+                message: "Starting...".to_string(),
+            },
+        )
+        .map_err(|e| format!("Error while starting progress bar: {}", e))?;
 
     let start_time = Instant::now();
     let global_resource_pool = RwLock::new(vec![]);
@@ -54,11 +68,11 @@ async fn begin_first_run<R: tauri::Runtime>(
     let scraping_elapsed = start_time.elapsed();
     info!("Indexing took {}", format_duration(scraping_elapsed));
 
-    info!(
-        "Indexed {} characters, {} enemies",
-        characters.len(),
-        enemies.len()
-    );
+    // info!(
+    //     "Indexed {} characters, {} enemies",
+    //     characters.len(),
+    //     enemies.len()
+    // );
 
     info!(
         "{} resource(s) to be downloaded",
@@ -79,25 +93,17 @@ async fn begin_first_run<R: tauri::Runtime>(
 
     info!("Writing character data");
     for character in characters {
-        data::write_character(&character);
+        // data::write_character(&character);
         debug!("Data for character {} written to disk", character.name);
     }
 
-    info!("Writing enemy data");
-    for enemy in enemies {
-        data::write_enemy(&enemy);
-        debug!("Data for enemy {} written to disk", enemy.name);
-    }
+    // info!("Writing enemy data");
+    // for enemy in enemies {
+    //     data::write_enemy(&enemy);
+    //     debug!("Data for enemy {} written to disk", enemy.name);
+    // }
     info!("Everything's ready, starting...");
 
-    Ok(())
-}
-
-#[tauri::command]
-async fn test_progress<R: tauri::Runtime>(
-    app: tauri::AppHandle<R>,
-    window: tauri::Window<R>,
-) -> Result<(), String> {
     Ok(())
 }
 
@@ -113,7 +119,7 @@ async fn main() {
     // }
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![begin_first_run, test_progress])
+        .invoke_handler(tauri::generate_handler![begin_first_run,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

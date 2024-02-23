@@ -16,7 +16,7 @@ pub fn setup() {
         .format(move |out, msg, record| {
             out.finish(format_args!(
                 "\x1B[{}m[{}:{}]\x1B[0m [{}] {}",
-                Color::Black.to_fg_str(),
+                Color::BrightBlack.to_fg_str(),
                 record.target(),
                 record.line().unwrap_or(u32::MAX),
                 wrap_color(record, &color_config),
