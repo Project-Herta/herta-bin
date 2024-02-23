@@ -11,7 +11,8 @@ function App() {
       <h1>Herta needs to get stuff!</h1>
       <p>Miss Herta needs to collect information before everything starts</p>
       <progress id="first-run" max="10" value="0"></progress>
-      <p id="first-run-label">Currently on:</p>
+      <p id="first-run-label"></p>
+      <button onClick={() => invoke("test_progress")}>Click Me!</button>
     </div>
   );
 }

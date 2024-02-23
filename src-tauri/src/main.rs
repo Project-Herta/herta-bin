@@ -93,6 +93,14 @@ async fn begin_first_run<R: tauri::Runtime>(
     Ok(())
 }
 
+#[tauri::command]
+async fn test_progress<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+    window: tauri::Window<R>,
+) -> Result<(), String> {
+    Ok(())
+}
+
 #[tokio::main]
 async fn main() {
     logger::setup();
@@ -105,7 +113,7 @@ async fn main() {
     // }
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![begin_first_run])
+        .invoke_handler(tauri::generate_handler![begin_first_run, test_progress])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

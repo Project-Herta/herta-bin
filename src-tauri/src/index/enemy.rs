@@ -1,6 +1,6 @@
-use ::tauri::{Runtime, Window};
 use std::sync::Arc;
 use std::sync::RwLock;
+use tauri::{Runtime, Window};
 
 use log::info;
 

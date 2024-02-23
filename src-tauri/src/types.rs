@@ -5,7 +5,7 @@ use std::sync::RwLock;
 
 use crate::downloader::Downloadable;
 
-pub mod tauri;
+pub mod frontend;
 
 const STAR_CHAR: &str = "✦";
 
