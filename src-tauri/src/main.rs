@@ -68,11 +68,11 @@ async fn begin_first_run<R: tauri::Runtime>(
     let scraping_elapsed = start_time.elapsed();
     info!("Indexing took {}", format_duration(scraping_elapsed));
 
-    // info!(
-    //     "Indexed {} characters, {} enemies",
-    //     characters.len(),
-    //     enemies.len()
-    // );
+    info!(
+        "Indexed {} characters, {} enemies",
+        characters.len(),
+        enemies.len()
+    );
 
     info!(
         "{} resource(s) to be downloaded",
@@ -119,6 +119,7 @@ async fn main() {
     // }
 
     tauri::Builder::default()
+        .manage(crate::types::FrontendState::default())
         .invoke_handler(tauri::generate_handler![begin_first_run,])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
