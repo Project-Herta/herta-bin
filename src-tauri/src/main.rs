@@ -57,13 +57,12 @@ async fn begin_first_run<R: tauri::Runtime>(
         .map_err(|e| format!("Error while starting progress bar: {}", e))?;
 
     let start_time = Instant::now();
-    let global_resource_pool = RwLock::new(vec![]);
     let mut characters = vec![];
     let mut enemies = vec![];
 
     info!("Waiting for both tasks to finish");
-    index::character::index_characters(&global_resource_pool, &mut characters, &window).await;
-    index::enemy::index_enemies(&global_resource_pool, &mut enemies, &window).await;
+    index::character::index_characters(&mut characters, &window).await;
+    index::enemy::index_enemies(&mut enemies, &window).await;
 
     let scraping_elapsed = start_time.elapsed();
     info!("Indexing took {}", format_duration(scraping_elapsed));
@@ -72,11 +71,6 @@ async fn begin_first_run<R: tauri::Runtime>(
         "Indexed {} characters, {} enemies",
         characters.len(),
         enemies.len()
-    );
-
-    info!(
-        "{} resource(s) to be downloaded",
-        &global_resource_pool.read().unwrap().len()
     );
 
     // let download_total = downloader::download_resources(&global_resource_pool)

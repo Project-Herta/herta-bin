@@ -8,11 +8,7 @@ use crate::types::*;
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
-pub async fn index_characters<R: Runtime>(
-    resource_pool: &RwLock<Vec<Arc<RwLock<Download>>>>,
-    characters: &mut Vec<Character>,
-    window: &Window<R>,
-) {
+pub async fn index_characters<R: Runtime>(characters: &mut Vec<Character>, window: &Window<R>) {
     let resp = reqwest::get(CHARACTER_INDEX)
         .await
         .unwrap()
@@ -79,17 +75,11 @@ pub async fn index_characters<R: Runtime>(
             character_resources.push(Download::new(DownloadType::VoiceOver, voice_url));
         }
 
-        // We lock the pool here when we will
-        // ACTUALLY use it. Previously, we'd
-        // await the acquisition of the lock
-        // way before we were going to use it
-        let mut pool = resource_pool.write().unwrap();
         character_resources
             .iter()
             .filter_map(|res| res.clone())
             .for_each(|resource| {
                 character.add_resource(resource.clone());
-                pool.push(resource.clone());
             });
 
         characters.push(character);

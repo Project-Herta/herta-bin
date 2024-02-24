@@ -1,4 +1,5 @@
 use crate::types::*;
+use log::debug;
 use std::fs::{create_dir_all, OpenOptions};
 
 pub fn write_character(character: &Character) {
@@ -13,6 +14,8 @@ pub fn write_character(character: &Character) {
     }
 
     let filename = root_dir.join(format!("{}.json", character.name));
+    debug!("Writing character info to {:?}", filename);
+
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)
@@ -41,6 +44,8 @@ pub fn write_enemy(enemy: &Enemy) {
     }
 
     let filename = root_dir.join(format!("{}.json", enemy.name));
+    debug!("Writing enemy info to {:?}", filename);
+
     let mut file = OpenOptions::new()
         .write(true)
         .create(true)

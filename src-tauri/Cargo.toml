@@ -1,11 +1,11 @@
 [package]
-name = "app"
+name = "herta-bin"
 version = "0.1.0"
 description = "Project Herta Desktop App"
 authors = ["Kiwifuit<inhumane.tar.xz@proton.me>"]
 license = ""
 repository = ""
-default-run = "app"
+default-run = "herta-bin"
 edition = "2021"
 rust-version = "1.60"
 

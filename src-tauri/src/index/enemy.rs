@@ -9,11 +9,7 @@ use crate::types::*;
 
 const ENEMY_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Category:Enemies";
 
-pub async fn index_enemies<R: Runtime>(
-    resource_pool: &RwLock<Vec<Arc<RwLock<Download>>>>,
-    enemies: &mut Vec<Enemy>,
-    window: &Window<R>,
-) {
+pub async fn index_enemies<R: Runtime>(enemies: &mut Vec<Enemy>, window: &Window<R>) {
     let resp = reqwest::get(ENEMY_INDEX)
         .await
         .unwrap()
@@ -62,13 +58,11 @@ pub async fn index_enemies<R: Runtime>(
         // ACTUALLY use it. Previously, we'd
         // await the acquisition of the lock
         // way before we were going to use it
-        let mut pool = resource_pool.write().unwrap();
         enemy_resources
             .iter()
             .filter_map(|res| res.clone())
             .for_each(|resource| {
                 enemy.add_resource(resource.clone());
-                pool.push(resource.clone());
             });
         enemies.push(enemy);
     }
