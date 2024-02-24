@@ -35,7 +35,7 @@ listen("start-progress", (e) => {
 
 listen("first-run-finished", () => {
   console.log("Initialization has finished");
-  location.reload();
+  window.location.reload();
 })
 
 export default FirstRunScreen;
