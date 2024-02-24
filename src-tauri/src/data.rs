@@ -1,6 +1,7 @@
 use crate::types::*;
 use log::debug;
 use std::fs::{create_dir_all, OpenOptions};
+use std::path::PathBuf;
 
 pub fn write_character(character: &Character) {
     let root_dir = herta::data::get_root_dir(
@@ -60,4 +61,12 @@ pub fn write_enemy(enemy: &Enemy) {
     {
         herta::data::write_config(&mut file, enemy);
     }
+}
+
+pub fn read_character(file: &PathBuf) -> Character {
+    debug!("Reading character found on {:?}", file.display());
+
+    let mut file = OpenOptions::new().read(true).open(file).unwrap();
+
+    herta::data::get_config(file).unwrap()
 }

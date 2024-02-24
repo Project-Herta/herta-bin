@@ -1,8 +1,7 @@
-use tauri::{Runtime, Window};
-
-use log::{debug, info};
-
 use crate::types::*;
+use log::{debug, info};
+use std::fs::read_dir;
+use tauri::{Runtime, Window};
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
@@ -105,6 +104,18 @@ pub async fn index_characters<R: Runtime>(
 pub async fn get_characters<R: Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
-) -> Result<(), String> {
-    Ok(())
+) -> Result<Vec<Character>, String> {
+    let char_dir = herta::data::get_root_dir(
+        env!("CARGO_BIN_NAME"),
+        Some(format!("{}/characters", env!("CARGO_PKG_VERSION_MAJOR"))),
+    );
+
+    let mut characters = vec![];
+    for character in read_dir(char_dir).unwrap() {
+        let path = character.unwrap().path();
+
+        characters.push(crate::data::read_character(&path))
+    }
+
+    Ok(characters)
 }

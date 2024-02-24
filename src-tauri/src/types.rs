@@ -89,6 +89,7 @@ impl Download {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Character {
+    id: usize,
     pub name: String,
     link: String,
     rarity: String,
@@ -101,6 +102,7 @@ pub struct Character {
 impl From<herta::extractor::Character> for Character {
     fn from(value: herta::extractor::Character) -> Self {
         Self {
+            id: value.id,
             name: value.name,
             link: value.link,
             rarity: value.rarity.chars().next().unwrap().to_string(),
@@ -202,6 +204,7 @@ impl TryFrom<String> for CharacterPath {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Enemy {
+    id: usize,
     pub link: String,
     pub name: String,
     pub resistances: Vec<u8>,
@@ -213,6 +216,7 @@ pub struct Enemy {
 impl From<herta::extractor::Enemy> for Enemy {
     fn from(value: herta::extractor::Enemy) -> Self {
         Self {
+            id: value.id,
             name: value.name,
             link: value.link,
             resistances: vec![],
