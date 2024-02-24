@@ -10,10 +10,12 @@ use humantime::format_duration;
 use log::debug;
 use log::info;
 use log::warn;
+use std::fs::File;
 use std::path::PathBuf;
 use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
+use tauri::State;
 
 mod audio;
 mod data;
@@ -24,9 +26,10 @@ mod types;
 
 #[tauri::command]
 #[allow(dead_code)]
-async fn begin_first_run<R: tauri::Runtime>(
+async fn begin_first_run<'a, R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
+    state: State<'a, types::FrontendState>,
 ) -> Result<(), String> {
     sleep(Duration::from_secs(1));
     info!("========================================================");
@@ -64,67 +67,54 @@ async fn begin_first_run<R: tauri::Runtime>(
         enemies.len()
     );
 
-    // let download_total = downloader::download_resources(&global_resource_pool)
-    //     .await
-    //     .unwrap();
-    // let download = start_time.elapsed();
-    // let ops = FormatSizeOptions::default();
-    // let download_total_size = format_size(download_total, ops);
-    // info!(
-    //     "First run took {}, {} downloaded",
-    //     format_duration(download),
-    //     download_total_size
-    // );
-
     info!("Writing character data");
-    for character in characters {
-        data::write_character(&character);
+    for character in &characters {
+        data::write_character(character);
         debug!("Data for character {} written to disk", character.name);
     }
 
     info!("Writing enemy data");
-    for enemy in enemies {
-        data::write_enemy(&enemy);
+    for enemy in &enemies {
+        data::write_enemy(enemy);
         debug!("Data for enemy {} written to disk", enemy.name);
     }
-    info!("Everything's ready, starting...");
 
+    // Wrapping up
+    let mut state_characters = state.characters.lock().unwrap();
+    let mut state_enemies = state.enemies.lock().unwrap();
+
+    state_characters.extend(characters.into_iter());
+    state_enemies.extend(enemies.into_iter());
+    File::create(first_run_dir()).map_err(|e| format!("Error while finishing init: {}", e))?;
+    window
+        .emit("first-run-finished", Some(()))
+        .map_err(|e| format!("Error while starting progress bar: {}", e))?;
+
+    info!("Everything's ready, starting...");
     Ok(())
 }
 
 #[tauri::command]
-async fn get_first_run_file() -> PathBuf {
-    let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
+async fn first_run_complete() -> bool {
+    first_run_dir().exists()
+}
 
-    root_dir.join(".first_run")
+fn first_run_dir() -> PathBuf {
+    herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None).join(".first_run")
 }
 
 #[tokio::main]
 async fn main() {
     logger::setup();
-    // if !first_run_file.exists() {
-    //     first_run().await;
-    //     File::create(first_run_file).unwrap();
-    // }
 
     tauri::Builder::default()
         .manage(crate::types::FrontendState::default())
         .invoke_handler(tauri::generate_handler![
             begin_first_run,
-            get_first_run_file
+            first_run_complete,
+            index::character::get_characters,
+            index::enemy::get_enemies
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
-
-    // let player = soloud::Soloud::default().unwrap();
-    // // Trying to decide if we should even have a greeting voice over
-    // // audio::play_voice_over(&player, audio::VoiceOverType::Greeting);
-    // info!("This is a temp line, would be removed in the future");
-    // audio::play_voice_over(&player, audio::VoiceOverType::Parting);
-
-    // // FIXME: This should not be here in 1.0.0
-    // info!("Press CTRL + C to exit...");
-    // loop {
-    //     std::thread::yield_now()
-    // }
 }

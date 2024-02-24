@@ -100,3 +100,11 @@ pub async fn index_characters<R: Runtime>(
         characters.push(character);
     }
 }
+
+#[tauri::command]
+pub async fn get_characters<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    window: tauri::Window<R>,
+) -> Result<(), String> {
+    Ok(())
+}

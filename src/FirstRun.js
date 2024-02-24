@@ -10,7 +10,7 @@ function FirstRunScreen() {
       <img onLoad={() => { invoke("begin_first_run") }} className="herta-logo" src={logo} alt="Project Herta Logo" />
       <h1>Herta needs to get stuff!</h1>
       <p>Miss Herta needs to collect information before everything starts.</p>
-      <p className="warn">This will take ~10 minutes, but will never happen again</p>
+      <p className="warn">This will take ~5 minutes, but will never happen again</p>
       <progress id="first-run" value="0"></progress>
       <p id="first-run-label"></p>
     </div>
@@ -33,4 +33,9 @@ listen("start-progress", (e) => {
   progress_bar.setAttribute("max", `${total}`);
 })
 
-export default App;
+listen("first-run-finished", () => {
+  console.log("Initialization has finished");
+  location.reload();
+})
+
+export default FirstRunScreen;

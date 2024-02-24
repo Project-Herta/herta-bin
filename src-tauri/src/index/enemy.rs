@@ -80,3 +80,11 @@ pub async fn index_enemies<R: Runtime>(enemies: &mut Vec<Enemy>, window: &Window
         enemies.push(enemy);
     }
 }
+
+#[tauri::command]
+pub async fn get_enemies<R: Runtime>(
+    app: tauri::AppHandle<R>,
+    window: tauri::Window<R>,
+) -> Result<(), String> {
+    Ok(())
+}

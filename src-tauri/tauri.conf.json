@@ -12,22 +12,7 @@
   },
   "tauri": {
     "allowlist": {
-      "all": false,
-      "fs": {
-        "all": false,
-        "copyFile": false,
-        "createDir": false,
-        "exists": true,
-        "readDir": false,
-        "readFile": true,
-        "removeDir": false,
-        "removeFile": false,
-        "renameFile": false,
-        "scope": [
-          "$LOCALDATA/herta-bin/**/*"
-        ],
-        "writeFile": false
-      }
+      "all": false
     },
     "bundle": {
       "active": true,
@@ -59,7 +44,11 @@
       "windows": {
         "certificateThumbprint": null,
         "digestAlgorithm": "sha256",
-        "timestampUrl": ""
+        "timestampUrl": "",
+        "webviewInstallMode": {
+          "silent": true,
+          "type": "embedBootstrapper"
+        }
       }
     },
     "security": {

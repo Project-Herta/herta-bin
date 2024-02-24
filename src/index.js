@@ -4,10 +4,14 @@ import './index.css';
 import FirstRunScreen from './FirstRun';
 import reportWebVitals from './reportWebVitals';
 
+import { invoke } from "@tauri-apps/api";
+
+let first_run_complete = await invoke("first_run_complete");
+
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <FirstRunScreen />
+    {!first_run_complete && <FirstRunScreen />}
   </React.StrictMode>
 );
 

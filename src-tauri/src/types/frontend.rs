@@ -15,6 +15,6 @@ pub struct InitializeProgBar {
 
 #[derive(Default)]
 pub struct FrontendState {
-    characters: Mutex<Vec<Character>>,
-    enemies: Mutex<Vec<Enemy>>,
+    pub characters: Mutex<Vec<Character>>,
+    pub enemies: Mutex<Vec<Enemy>>,
 }
