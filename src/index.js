@@ -1,10 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import FirstRunScreen from './FirstRun';
 import reportWebVitals from './reportWebVitals';
-
 import { invoke } from "@tauri-apps/api";
+
+import './index.module.css';
+import FirstRunScreen from './FirstRun';
+import HomePage from './HomePage';
 
 let first_run_complete = await invoke("first_run_complete");
 
@@ -12,6 +13,7 @@ const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     {!first_run_complete && <FirstRunScreen />}
+    {first_run_complete && <HomePage />}
   </React.StrictMode>
 );
 
