@@ -1,10 +1,10 @@
-import './App.css';
+import './FirstRun.css';
 import logo from './icon.png';
 
 import { invoke } from "@tauri-apps/api";
 import { listen } from "@tauri-apps/api/event";
 
-function App() {
+function FirstRunScreen() {
   return (
     <div className="app" >
       <img onLoad={() => { invoke("begin_first_run") }} className="herta-logo" src={logo} alt="Project Herta Logo" />

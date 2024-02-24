@@ -8,9 +8,9 @@
 
 use humantime::format_duration;
 use log::debug;
-use log::error;
 use log::info;
 use log::warn;
+use std::path::PathBuf;
 use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
@@ -92,12 +92,16 @@ async fn begin_first_run<R: tauri::Runtime>(
     Ok(())
 }
 
+#[tauri::command]
+async fn get_first_run_file() -> PathBuf {
+    let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
+
+    root_dir.join(".first_run")
+}
+
 #[tokio::main]
 async fn main() {
     logger::setup();
-    let root_dir = herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None);
-    let first_run_file = root_dir.join(".first_run");
-
     // if !first_run_file.exists() {
     //     first_run().await;
     //     File::create(first_run_file).unwrap();
@@ -105,7 +109,10 @@ async fn main() {
 
     tauri::Builder::default()
         .manage(crate::types::FrontendState::default())
-        .invoke_handler(tauri::generate_handler![begin_first_run,])
+        .invoke_handler(tauri::generate_handler![
+            begin_first_run,
+            get_first_run_file
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
