@@ -6,23 +6,14 @@
 //!
 //! Please forgive :)
 
-use humansize::format_size;
-use humansize::FormatSizeOptions;
 use humantime::format_duration;
 use log::debug;
 use log::error;
 use log::info;
 use log::warn;
-use serde::Serialize;
-use std::fs::File;
-use std::path::PathBuf;
-use std::sync::Arc;
-use std::sync::RwLock;
 use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
-
-use crate::types::Download;
 
 mod audio;
 mod data;

@@ -1,5 +1,3 @@
-use std::sync::Arc;
-use std::sync::RwLock;
 use tauri::{Runtime, Window};
 
 use log::info;
@@ -19,30 +17,36 @@ pub async fn index_enemies<R: Runtime>(enemies: &mut Vec<Enemy>, window: &Window
 
     let enemies_raw = herta::extractor::index_enemies(resp);
 
-    window.emit(
-        "download-progress",
-        crate::types::DownloadProgress {
-            current_progress: 0,
-            message: format!("Indexing enemies"),
-        },
-    );
+    window
+        .emit(
+            "download-progress",
+            crate::types::DownloadProgress {
+                current_progress: 0,
+                message: "Indexing enemies".to_string(),
+            },
+        )
+        .expect("Expected progress bar to update");
 
-    window.emit(
-        "start-progress",
-        crate::types::InitializeProgBar {
-            total: enemies_raw.len(),
-        },
-    );
+    window
+        .emit(
+            "start-progress",
+            crate::types::InitializeProgBar {
+                total: enemies_raw.len(),
+            },
+        )
+        .expect("Expected progress bar to update");
 
     for (indx, enemy) in enemies_raw.into_iter().enumerate() {
         info!("Processing data for enemy: {}", &enemy.name);
-        window.emit(
-            "download-progress",
-            crate::types::DownloadProgress {
-                current_progress: indx,
-                message: format!("Indexing enemy: {}", enemy.name),
-            },
-        );
+        window
+            .emit(
+                "download-progress",
+                crate::types::DownloadProgress {
+                    current_progress: indx,
+                    message: format!("Indexing enemy: {}", enemy.name),
+                },
+            )
+            .expect("Expected progress bar to update");
 
         let mut enemy_resources = vec![];
 

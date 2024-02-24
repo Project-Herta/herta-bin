@@ -1,5 +1,3 @@
-use std::sync::Arc;
-use std::sync::RwLock;
 use tauri::{Runtime, Window};
 
 use log::{debug, info};
@@ -20,30 +18,36 @@ pub async fn index_characters<R: Runtime>(
         .unwrap();
     let characters_raw = herta::extractor::index_characters(resp);
 
-    window.emit(
-        "download-progress",
-        crate::types::DownloadProgress {
-            current_progress: 0,
-            message: format!("Indexing characters"),
-        },
-    );
+    window
+        .emit(
+            "download-progress",
+            crate::types::DownloadProgress {
+                current_progress: 0,
+                message: "Indexing characters".to_string(),
+            },
+        )
+        .expect("Expected progress bar to update");
 
-    window.emit(
-        "start-progress",
-        crate::types::InitializeProgBar {
-            total: characters_raw.len(),
-        },
-    );
+    window
+        .emit(
+            "start-progress",
+            crate::types::InitializeProgBar {
+                total: characters_raw.len(),
+            },
+        )
+        .expect("Expected progress bar to update");
 
     for (indx, character) in characters_raw.into_iter().enumerate() {
         info!("Processing data for character {}", &character.name);
-        window.emit(
-            "download-progress",
-            crate::types::DownloadProgress {
-                current_progress: indx,
-                message: format!("Indexing character: {}", character.name),
-            },
-        );
+        window
+            .emit(
+                "download-progress",
+                crate::types::DownloadProgress {
+                    current_progress: indx,
+                    message: format!("Indexing character: {}", character.name),
+                },
+            )
+            .expect("Expected progress bar to update");
 
         let mut character_resources = vec![];
 
