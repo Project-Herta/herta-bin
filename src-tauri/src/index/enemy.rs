@@ -17,6 +17,8 @@ pub async fn index_enemies<R: Runtime>(enemies: &mut Vec<Enemy>, window: &Window
         .await
         .unwrap();
 
+    let enemies_raw = herta::extractor::index_enemies(resp);
+
     window.emit(
         "download-progress",
         crate::types::DownloadProgress {
@@ -25,12 +27,19 @@ pub async fn index_enemies<R: Runtime>(enemies: &mut Vec<Enemy>, window: &Window
         },
     );
 
-    for enemy in herta::extractor::index_enemies(resp) {
+    window.emit(
+        "start-progress",
+        crate::types::InitializeProgBar {
+            total: enemies_raw.len(),
+        },
+    );
+
+    for (indx, enemy) in enemies_raw.into_iter().enumerate() {
         info!("Processing data for enemy: {}", &enemy.name);
         window.emit(
             "download-progress",
             crate::types::DownloadProgress {
-                current_progress: 0,
+                current_progress: indx,
                 message: format!("Indexing enemy: {}", enemy.name),
             },
         );

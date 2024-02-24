@@ -8,13 +8,17 @@ use crate::types::*;
 
 const CHARACTER_INDEX: &str = "https://honkai-star-rail.fandom.com/wiki/Character/List";
 
-pub async fn index_characters<R: Runtime>(characters: &mut Vec<Character>, window: &Window<R>) {
+pub async fn index_characters<R: Runtime>(
+    characters: &mut Vec<crate::types::Character>,
+    window: &Window<R>,
+) {
     let resp = reqwest::get(CHARACTER_INDEX)
         .await
         .unwrap()
         .text()
         .await
         .unwrap();
+    let characters_raw = herta::extractor::index_characters(resp);
 
     window.emit(
         "download-progress",
@@ -24,12 +28,19 @@ pub async fn index_characters<R: Runtime>(characters: &mut Vec<Character>, windo
         },
     );
 
-    for character in herta::extractor::index_characters(resp) {
+    window.emit(
+        "start-progress",
+        crate::types::InitializeProgBar {
+            total: characters_raw.len(),
+        },
+    );
+
+    for (indx, character) in characters_raw.into_iter().enumerate() {
         info!("Processing data for character {}", &character.name);
         window.emit(
             "download-progress",
             crate::types::DownloadProgress {
-                current_progress: 0,
+                current_progress: indx,
                 message: format!("Indexing character: {}", character.name),
             },
         );

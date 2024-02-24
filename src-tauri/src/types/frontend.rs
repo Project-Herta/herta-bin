@@ -4,13 +4,13 @@ use std::sync::Mutex;
 
 #[derive(Serialize, Clone)]
 pub struct DownloadProgress {
-    pub current_progress: u8,
+    pub current_progress: usize,
     pub message: String,
 }
 
 #[derive(Serialize, Clone)]
 pub struct InitializeProgBar {
-    pub total: u8,
+    pub total: usize,
 }
 
 #[derive(Default)]
