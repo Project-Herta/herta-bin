@@ -1,0 +1,14 @@
+.main {
+  display: flex;
+  gap: 2rem
+}
+
+.clist {
+  width: 30vw;
+}
+
+.ccontainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}

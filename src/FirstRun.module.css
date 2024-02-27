@@ -39,17 +39,15 @@
 .progress {
   margin: 0 auto;
   width: 75vw;
+
+  margin-bottom: 0 !important;
 }
 
 p:has(+.warn) {
   margin-bottom: 0;
 }
 
-.progress {
-  margin-bottom: 0 !important;
-}
-
-.progress+p {
+.progress+#first-run-label {
   margin-top: 0.5em;
   margin-bottom: 1.75rem;
   font-size: 0.8rem;

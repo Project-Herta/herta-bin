@@ -64,9 +64,9 @@ pub fn write_enemy(enemy: &Enemy) {
 }
 
 pub fn read_character(file: &PathBuf) -> Character {
-    debug!("Reading character found on {:?}", file.display());
+    // debug!("Reading character found on {:?}", file.display());
 
-    let mut file = OpenOptions::new().read(true).open(file).unwrap();
+    let file = OpenOptions::new().read(true).open(file).unwrap();
 
     herta::data::get_config(file).unwrap()
 }

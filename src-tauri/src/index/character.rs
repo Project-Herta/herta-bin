@@ -101,7 +101,7 @@ pub async fn index_characters<R: Runtime>(
 }
 
 #[tauri::command]
-pub async fn get_characters<R: Runtime>(
+pub fn get_characters<R: Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
 ) -> Result<Vec<Character>, String> {
