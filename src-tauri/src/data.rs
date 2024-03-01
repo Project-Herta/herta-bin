@@ -3,11 +3,12 @@ use log::debug;
 use std::fs::{create_dir_all, OpenOptions};
 use std::path::PathBuf;
 
-pub fn write_character(character: &Character) {
-    let root_dir = herta::data::get_root_dir(
-        env!("CARGO_BIN_NAME"),
-        Some(format!("{}/characters", env!("CARGO_PKG_VERSION_MAJOR"))),
-    );
+pub fn write_character<R: tauri::Runtime>(character: &Character, app: &tauri::AppHandle<R>) {
+    let root_dir = app
+        .path_resolver()
+        .app_data_dir()
+        .unwrap()
+        .join(format!("{}/characters", env!("CARGO_PKG_VERSION_MAJOR")));
 
     #[allow(unused_must_use)]
     if !root_dir.exists() {
@@ -33,11 +34,12 @@ pub fn write_character(character: &Character) {
     }
 }
 
-pub fn write_enemy(enemy: &Enemy) {
-    let root_dir = herta::data::get_root_dir(
-        env!("CARGO_BIN_NAME"),
-        Some(format!("{}/enemies", env!("CARGO_PKG_VERSION_MAJOR"))),
-    );
+pub fn write_enemy<R: tauri::Runtime>(enemy: &Enemy, app: &tauri::AppHandle<R>) {
+    let root_dir = app
+        .path_resolver()
+        .app_data_dir()
+        .unwrap()
+        .join(format!("{}/enemies", env!("CARGO_PKG_VERSION_MAJOR")));
 
     #[allow(unused_must_use)]
     if !root_dir.exists() {

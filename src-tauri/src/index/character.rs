@@ -105,11 +105,13 @@ pub fn get_characters<R: Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
 ) -> Result<Vec<Character>, String> {
-    let char_dir = herta::data::get_root_dir(
-        env!("CARGO_BIN_NAME"),
-        Some(format!("{}/characters", env!("CARGO_PKG_VERSION_MAJOR"))),
-    );
+    let char_dir = app
+        .path_resolver()
+        .app_data_dir()
+        .unwrap()
+        .join(format!("{}/characters", env!("CARGO_PKG_VERSION_MAJOR")));
 
+    dbg!(&char_dir);
     let mut characters = vec![];
     for character in read_dir(char_dir).unwrap() {
         let path = character.unwrap().path();

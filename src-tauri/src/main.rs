@@ -1,15 +1,11 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-//! The entire codebase is going through a
-//! MASSIVE CODE OVERHAUL
-//!
-//! Please forgive :)
-
 use humantime::format_duration;
 use log::debug;
 use log::info;
 use log::warn;
+use std::fs;
 use std::fs::File;
 use std::path::PathBuf;
 use std::thread::sleep;
@@ -26,10 +22,10 @@ mod types;
 
 #[tauri::command]
 #[allow(dead_code)]
-async fn begin_first_run<'a, R: tauri::Runtime>(
+async fn begin_first_run<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
-    state: State<'a, types::FrontendState>,
+    state: State<'_, types::FrontendState>,
 ) -> Result<(), String> {
     sleep(Duration::from_secs(1));
     info!("========================================================");
@@ -69,13 +65,13 @@ async fn begin_first_run<'a, R: tauri::Runtime>(
 
     info!("Writing character data");
     for character in &characters {
-        data::write_character(character);
+        data::write_character(character, &app);
         debug!("Data for character {} written to disk", character.name);
     }
 
     info!("Writing enemy data");
     for enemy in &enemies {
-        data::write_enemy(enemy);
+        data::write_enemy(enemy, &app);
         debug!("Data for enemy {} written to disk", enemy.name);
     }
 
@@ -85,7 +81,8 @@ async fn begin_first_run<'a, R: tauri::Runtime>(
 
     state_characters.extend(characters.into_iter());
     state_enemies.extend(enemies.into_iter());
-    File::create(first_run_dir()).map_err(|e| format!("Error while finishing init: {}", e))?;
+    File::create(first_run_file(app.path_resolver().app_data_dir().unwrap()))
+        .map_err(|e| format!("Error while finishing init: {}", e))?;
     window
         .emit("first-run-finished", Some(()))
         .map_err(|e| format!("Error while starting progress bar: {}", e))?;
@@ -95,12 +92,12 @@ async fn begin_first_run<'a, R: tauri::Runtime>(
 }
 
 #[tauri::command]
-async fn first_run_complete() -> bool {
-    first_run_dir().exists()
+async fn first_run_complete<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> bool {
+    first_run_file(app.path_resolver().app_data_dir().unwrap()).exists()
 }
 
-fn first_run_dir() -> PathBuf {
-    herta::data::get_root_dir::<String>(env!("CARGO_BIN_NAME"), None).join(".first_run")
+fn first_run_file(data_dir: PathBuf) -> PathBuf {
+    data_dir.join(".first_run")
 }
 
 #[tokio::main]
@@ -109,6 +106,10 @@ async fn main() {
 
     tauri::Builder::default()
         .manage(crate::types::FrontendState::default())
+        .setup(|app| {
+            dbg!(first_run_file(app.path_resolver().app_data_dir().unwrap()).exists());
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             begin_first_run,
             first_run_complete,

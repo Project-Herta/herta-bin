@@ -45,15 +45,6 @@ where
     }
 }
 
-// DEPRECATED: Delete these on the next commit
-// #[derive(Error, Debug)]
-// #[derive(Error, Debug)]
-// pub enum FormatError {
-//     #[error("Invalid header (expected {expected:?}, got {found:?})")]
-//     InvalidHeader { expected: String, found: String },
-//     #[error("Missing attribute: {0}")]
-//     MissingAttribute(String),
-// }
 #[derive(Error, Debug)]
 pub enum DownloadError {
     #[error("An error occurred while trying to get resource: {0}")]
