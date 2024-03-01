@@ -164,13 +164,6 @@ async fn main() {
     tauri::Builder::default()
         .manage(crate::types::FrontendState::default())
         .setup(|app| {
-            dbg!(first_run_file(
-                app.path_resolver()
-                    .app_data_dir()
-                    .ok_or(CommandError::AppDirResolver)?
-            )
-            .exists());
-
             #[cfg(debug_assertions)]
             #[cfg_attr(debug_assertions, allow(clippy::bind_instead_of_map))]
             app.get_window("main").and_then(|win| {
