@@ -8,7 +8,7 @@ use crate::downloader::Downloadable;
 pub mod frontend;
 pub use frontend::*;
 
-const STAR_CHAR: &str = "✦";
+// const STAR_CHAR: &str = "✦";
 
 #[derive(Debug, PartialEq, Clone, Serialize, Deserialize)]
 pub struct Download {
@@ -82,9 +82,9 @@ impl Download {
         }
     }
 
-    fn is_downloaded(&self) -> bool {
-        self.file.is_some()
-    }
+    // fn is_downloaded(&self) -> bool {
+    //     self.file.is_some()
+    // }
 }
 
 #[derive(Debug, Serialize, Deserialize)]

@@ -5,13 +5,16 @@ use humantime::format_duration;
 use log::debug;
 use log::info;
 use log::warn;
-use std::fs;
+use serde::Serialize;
+use tauri::State;
+use thiserror::Error;
+
+use std::fmt::Display;
 use std::fs::File;
 use std::path::PathBuf;
 use std::thread::sleep;
 use std::time::Duration;
 use std::time::Instant;
-use tauri::State;
 
 mod audio;
 mod data;
@@ -20,13 +23,60 @@ mod index;
 mod logger;
 mod types;
 
+#[derive(Debug, Error)]
+pub enum CommandError {
+    #[error(transparent)]
+    CharacterIndex(#[from] index::character::CharacterIndexError),
+
+    #[error(transparent)]
+    EnemyIndex(#[from] index::enemy::EnemyIndexError),
+
+    #[error(transparent)]
+    Tauri(#[from] tauri::Error),
+
+    #[error(transparent)]
+    CreateFirstRunMarker(#[from] std::io::Error),
+
+    #[error(transparent)]
+    Data(#[from] data::DataError),
+
+    AppDirResolver,
+}
+
+impl Display for CommandError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "an error occurred when trying to execute a command: {}",
+            match self {
+                Self::CharacterIndex(e) => e.to_string(),
+                Self::EnemyIndex(e) => e.to_string(),
+                Self::Tauri(e) => e.to_string(),
+                Self::CreateFirstRunMarker(e) => e.to_string(),
+                Self::Data(e) => e.to_string(),
+                Self::AppDirResolver =>
+                    "tauri's app dir utilities unexpectedly returned None".to_string(),
+            }
+        )
+    }
+}
+
+impl Serialize for CommandError {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_str(self.to_string().as_ref())
+    }
+}
+
 #[tauri::command]
 #[allow(dead_code)]
 async fn begin_first_run<R: tauri::Runtime>(
     app: tauri::AppHandle<R>,
     window: tauri::Window<R>,
     state: State<'_, types::FrontendState>,
-) -> Result<(), String> {
+) -> Result<(), CommandError> {
     sleep(Duration::from_secs(1));
     info!("========================================================");
     info!("First Run!");
@@ -36,23 +86,21 @@ async fn begin_first_run<R: tauri::Runtime>(
     warn!("This procedure will take around 20 minutes (including downloads)");
     info!("========================================================");
 
-    window
-        .emit(
-            "download-progress",
-            types::DownloadProgress {
-                current_progress: 0,
-                message: "Starting...".to_string(),
-            },
-        )
-        .map_err(|e| format!("Error while starting progress bar: {}", e))?;
+    window.emit(
+        "download-progress",
+        types::DownloadProgress {
+            current_progress: 0,
+            message: "Starting...".to_string(),
+        },
+    )?;
 
     let start_time = Instant::now();
     let mut characters = vec![];
     let mut enemies = vec![];
 
     info!("Waiting for both tasks to finish");
-    index::character::index_characters(&mut characters, &window).await;
-    index::enemy::index_enemies(&mut enemies, &window).await;
+    index::character::index_characters(&mut characters, &window).await?;
+    index::enemy::index_enemies(&mut enemies, &window).await?;
 
     let scraping_elapsed = start_time.elapsed();
     info!("Indexing took {}", format_duration(scraping_elapsed));
@@ -65,13 +113,13 @@ async fn begin_first_run<R: tauri::Runtime>(
 
     info!("Writing character data");
     for character in &characters {
-        data::write_character(character, &app);
+        data::write_character(character, &app)?;
         debug!("Data for character {} written to disk", character.name);
     }
 
     info!("Writing enemy data");
     for enemy in &enemies {
-        data::write_enemy(enemy, &app);
+        data::write_enemy(enemy, &app)?;
         debug!("Data for enemy {} written to disk", enemy.name);
     }
 
@@ -81,19 +129,27 @@ async fn begin_first_run<R: tauri::Runtime>(
 
     state_characters.extend(characters.into_iter());
     state_enemies.extend(enemies.into_iter());
-    File::create(first_run_file(app.path_resolver().app_data_dir().unwrap()))
-        .map_err(|e| format!("Error while finishing init: {}", e))?;
-    window
-        .emit("first-run-finished", Some(()))
-        .map_err(|e| format!("Error while starting progress bar: {}", e))?;
+    File::create(first_run_file(
+        app.path_resolver()
+            .app_data_dir()
+            .ok_or(CommandError::AppDirResolver)?,
+    ))?;
+    window.emit("first-run-finished", Some(()))?;
 
     info!("Everything's ready, starting...");
     Ok(())
 }
 
 #[tauri::command]
-async fn first_run_complete<R: tauri::Runtime>(app: tauri::AppHandle<R>) -> bool {
-    first_run_file(app.path_resolver().app_data_dir().unwrap()).exists()
+async fn first_run_complete<R: tauri::Runtime>(
+    app: tauri::AppHandle<R>,
+) -> Result<bool, CommandError> {
+    Ok(first_run_file(
+        app.path_resolver()
+            .app_data_dir()
+            .ok_or(CommandError::AppDirResolver)?,
+    )
+    .exists())
 }
 
 fn first_run_file(data_dir: PathBuf) -> PathBuf {
@@ -107,7 +163,12 @@ async fn main() {
     tauri::Builder::default()
         .manage(crate::types::FrontendState::default())
         .setup(|app| {
-            dbg!(first_run_file(app.path_resolver().app_data_dir().unwrap()).exists());
+            dbg!(first_run_file(
+                app.path_resolver()
+                    .app_data_dir()
+                    .ok_or(CommandError::AppDirResolver)?
+            )
+            .exists());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
