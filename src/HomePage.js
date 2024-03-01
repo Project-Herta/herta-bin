@@ -2,7 +2,14 @@ import styles from "./HomePage.module.css";
 import { invoke } from "@tauri-apps/api";
 import { useState, useEffect } from "react";
 
-let characters = await invoke("get_characters");
+// For some god awful reason, the HomePage
+// component renders on the DOM for 0.0000001
+// microseconds even though a check for
+// the first run is already done on the
+// index.js page
+if (await invoke("first_run_complete")) {
+  var characters = await invoke("get_characters");
+}
 
 function HomePage() {
   return (

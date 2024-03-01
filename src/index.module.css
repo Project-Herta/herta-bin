@@ -47,7 +47,7 @@ progress[value] {
   background-color: var(--ui-bg);
   width: 100%;
   border-radius: var(--prog-br);
-  margin-bottom: 1.75rem;
+  margin-bottom: 0;
 }
 
 /* Chrome/Background */

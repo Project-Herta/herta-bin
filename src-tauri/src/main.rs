@@ -6,6 +6,7 @@ use log::debug;
 use log::info;
 use log::warn;
 use serde::Serialize;
+use tauri::Manager;
 use tauri::State;
 use thiserror::Error;
 
@@ -169,6 +170,15 @@ async fn main() {
                     .ok_or(CommandError::AppDirResolver)?
             )
             .exists());
+
+            #[cfg(debug_assertions)]
+            #[cfg_attr(debug_assertions, allow(clippy::bind_instead_of_map))]
+            app.get_window("main").and_then(|win| {
+                win.open_devtools();
+
+                Some(())
+            });
+
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![

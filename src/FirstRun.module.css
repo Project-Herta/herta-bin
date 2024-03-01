@@ -38,9 +38,7 @@
 
 .progress {
   margin: 0 auto;
-  width: 75vw;
-
-  margin-bottom: 0 !important;
+  width: min(75vw, 1000px);
 }
 
 p:has(+.warn) {
