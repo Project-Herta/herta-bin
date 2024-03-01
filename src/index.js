@@ -12,8 +12,7 @@ let first_run_complete = await invoke("first_run_complete");
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    {!first_run_complete && <FirstRunScreen />}
-    {first_run_complete && <HomePage />}
+    {first_run_complete ? <HomePage /> : <FirstRunScreen />}
   </React.StrictMode>
 );
 

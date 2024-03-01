@@ -59,11 +59,15 @@
     },
     "windows": [
       {
-        "fullscreen": false,
-        "height": 650,
-        "resizable": true,
         "title": "Herta",
-        "width": 900
+        "fullscreen": false,
+        "resizable": true,
+        "center": true,
+        "height": 700,
+        "width": 850,
+        "minHeight": 650,
+        "minWidth": 900,
+        "contentProtected": true
       }
     ]
   }

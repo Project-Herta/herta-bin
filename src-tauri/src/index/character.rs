@@ -143,7 +143,6 @@ pub fn get_characters<R: Runtime>(
         .ok_or(CharacterIndexError::AppDir)?
         .join(format!("{}/characters", env!("CARGO_PKG_VERSION_MAJOR")));
 
-    dbg!(&char_dir);
     let mut characters = vec![];
     for character in read_dir(char_dir)? {
         let path = character?.path();
